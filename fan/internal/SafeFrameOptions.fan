@@ -1,16 +1,17 @@
 using afBedSheet::HttpRequest
 using afBedSheet::HttpResponse
 
-// https://github.com/sinatra/sinatra/blob/master/rack-protection/lib/rack/protection/frame_options.rb
-** Sets an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame.
+** Protects against clickjacking by setting an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame.
 ** 
 **   table:
 **   --------------------------  ------------
 **   Helps prevent attacks from  Clickjacking
 **   Supported browsers          Internet Explorer 8, Firefox 3.6.9, Opera 10.50, Safari 4.0, Chrome 4.1.249.1042
 ** 
+** 
+** 
 ** Configuration
-** =============
+** *************
 ** 
 **   table:
 **   afIocConfig Key             Value
