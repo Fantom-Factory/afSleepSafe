@@ -1,0 +1,26 @@
+Overview
+********
+Let your BedApp Sleep Safe against CSFR, XSS, and other attacks.
+
+
+
+
+Quick Start
+***********
+1. Create a text file called 'Example.fan'
+
+    syntax: fantom
+
+    using gfx::Size
+    using fwt::Window
+    using afTerminal
+
+    class Example {
+    }
+
+2. Run 'Example.fan' as a Fantom script from the command line:
+
+    C:\> fan Example.fan
+
+
+
