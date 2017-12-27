@@ -26,7 +26,26 @@ internal const class WebTestModule {
 	
 	@Contribute { serviceType=Routes# }
 	Void contributeRoutes(Configuration config) {
-		config.add(Route(`/okay`, Text.fromPlain("Okay")))
+		scope := config.scope
+	
+		csrfHtml := "<!DOCTYPE html><html><body><form method='post' action='/post'><input name='nom1' value='val1'><input type='hidden' name='_csrfBuster' value='%{csrfToken}'></form></body></html>"
+		
+		csrf1 := |->Text| {
+			req := (HttpRequest) scope.serviceByType(HttpRequest#)
+			tok := (Str) req.stash["afSleepSafe.csrfToken"]
+			str := csrfHtml.replace("%{csrfToken}", tok)
+			return Text.fromHtml(str)
+		}.toImmutable
+		
+		postFn := |->Text| {
+			req := (HttpRequest) scope.serviceByType(HttpRequest#)
+			return Text.fromPlain("Post, nom1=" + req.body.form["nom1"])			
+		}.toImmutable
+
+		config.add(Route(`/get`, Text.fromPlain("Okay")))
+		config.add(Route(`/post`, postFn, "POST"))
+
+		config.add(Route(`/csrf1`, csrf1))
 	}
 
 	@Contribute { serviceType=ApplicationDefaults# }

@@ -1,5 +1,6 @@
 using afIoc::Inject
 using afBedSheet
+using util::Random
 
 ** Protects against CSRF attacks by enforcing an customisable [Encrypted Token Pattern]`https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Encrypted_Token_Pattern` strategy.
 **
@@ -111,14 +112,16 @@ using afBedSheet
 **       config["afSleepSafe.frameOptions"] = "deny"
 **   }
 ** 
-const class SafeCrsf : Protection {
+const class SafeCsrf : Protection {
 	
-	@Inject	private const HttpRequest	httpReq
-	@Inject	private const HttpResponse	httpRes
-	@Inject	private const HttpSession	httpSes
+	@Inject	private const HttpRequest		httpReq
+	@Inject	private const HttpResponse		httpRes
+	@Inject	private const HttpSession		httpSes
+	@Inject	private const CsrfCrypto		crypto
 
-	@Inject	private const Str			customHeaderName
-	@Inject	private const Regex			customHeaderValue	// note the RegEx! From Glob
+//	@Config	private const Str				customHeaderName
+//	@Config	private const Regex				customHeaderValue	// note the RegEx! From Glob
+//			private const Random		random
 	
 	new make(|This| f) { f(this) }
 	
@@ -126,14 +129,26 @@ const class SafeCrsf : Protection {
 	@NoDoc
 	override Str? protect(HttpRequest httpReq, HttpResponse httpRes) {
 		
-//		if (fromVunerableUrl) {
+		ret := null as Str
+		if (fromVunerableUrl) {
 //			checkReferrerAndOrigin	// deny if different - continue if not found
 //			okay if contains header
+			contentType := httpReq.headers.contentType
+			if (contentType.mediaType == "application" && contentType.subType == "x-www-form-urlencoded") {
+				form := httpReq.body.form
+				csrfToken	:= form["_csrfBuster"]
+				fanCode		:= crypto.decode(csrfToken)
+				fanObj		:= fanCode.toBuf.readObj
+				hash		:= (Str:Obj?) fanObj
+				
+				echo("GOT TS")
+			}
 //			checkCrsfToken
 //			deny if bad
-//		}
-//		generate token -> stash
-		
+		}
+
+		csrfToken := 
+		httpReq.stash["afSleepSafe.csrfToken"] = generateToken
 		
 		return null
 	}
@@ -151,7 +166,14 @@ const class SafeCrsf : Protection {
 		return true
 	}
 	
-//	Str? validateToken(HttpRequest httpReq, HttpResponse httpRes) {
-//		return null
-//	}
+	Str generateToken() {
+
+		// FIXME contribute funcs
+		obj := [:] { ordered = true }
+		obj["timestamp"]		= DateTime.now(1sec)
+		if (httpSes.exists)
+			obj["sessionId"]	= httpSes.id
+		
+		return crypto.encode(Buf().writeObj(obj).flip.readAllStr)
+	}
 }
