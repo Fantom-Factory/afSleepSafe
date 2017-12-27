@@ -28,5 +28,8 @@ internal const class SleepSafeMiddleware : Middleware {
 		// 403 - Forbidden
 		// log str
 		// text/html application/xhtml
+		
+		pipeline.service
+		
 	}
 }

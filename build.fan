@@ -1,4 +1,5 @@
 using build
+using util
 
 class Build : BuildPod {
 
@@ -16,17 +17,20 @@ class Build : BuildPod {
 
 		depends = [
 			"sys          1.0.70 - 1.0",
+			"concurrent   1.0.70 - 1.0",
+			"util         1.0.70 - 1.0",
 			
 			// ---- Core ------------------------
 			"afIoc        3.0.6  - 3.0",
 			"afIocConfig  1.1.0  - 1.1",
+			"afIocEnv     1.1.0  - 1.1",
+			"afConcurrent 1.0.20 - 1.1",
 
 			// ---- Web -------------------------
 			"afBedSheet   1.5.8  - 1.5",
 
 			// ---- Test ------------------------
 			"afBounce     1.1.6  - 1.1",
-			"concurrent   1.0.70 - 1.0",
 		]
 
 		srcDirs = [`fan/`, `fan/advanced/`, `fan/internal/`, `fan/internal/wip/`, `fan/public/`, `test/`]
