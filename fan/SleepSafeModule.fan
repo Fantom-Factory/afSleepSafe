@@ -32,7 +32,7 @@ const class SleepSafeModule {
 	Void contributeCsrfTokenGeneration(Configuration config, ConfigSource configSrc, HttpSession httpSession) {
 		config["timestamp"] = |Str:Obj? hash| {
 			timeoutResolution := (Duration?) configSrc.get("afSleepSafe.csrfTimeoutResolution", Duration#)
-			hash["timestamp"] = DateTime.now(timeoutResolution)
+			hash["timestamp"] = DateTime.nowUtc(timeoutResolution)
 		}
 		config["sessionId"] = |Str:Obj? hash| {
 			if (httpSession.exists)
@@ -45,7 +45,7 @@ const class SleepSafeModule {
 		config["timestamp"] = |Str:Obj? hash| {
 			timeout 			:= (Duration)  configSrc.get("afSleepSafe.csrfTokenTimeout", Duration#)
 			timeoutResolution	:= (Duration?) configSrc.get("afSleepSafe.csrfTimeoutResolution", Duration#)
-			duration := DateTime.now(timeoutResolution) - ((DateTime) hash["timestamp"])
+			duration := DateTime.nowUtc(timeoutResolution) - ((DateTime) hash["timestamp"])
 			if (duration >= timeout)
 				throw Err("Token exceeds ${timeout} timeout: ${duration}")
 		}

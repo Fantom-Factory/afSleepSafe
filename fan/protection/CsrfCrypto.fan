@@ -34,11 +34,11 @@ internal const class CsrfCrypto {
 		    iterations	:= iocEnv.isDev ? 0x10 : 0x10000
 		    keyBuf		:= Buf.pbk("PBKDF2WithHmacSHA256", passPhrase, salt, iterations, noOfBytes)
 			keyRef.val	= keyBuf.toImmutable
-			
+
 			keySpec	:= SecretKeySpec(toBytes(keyRef.val), "AES")
 			cipher	:= Cipher.getInstance("AES/CBC/PKCS5Padding")
 			cipher.init(Cipher.ENCRYPT_MODE, keySpec)
-	
+
 			// getParameterSpec() has some knarly Java generics which I can't figure out how to create in Fantom : "<T extends AlgorithmParameterSpec>"
 			// Note, java.lang.Class.asSubclass() does seem to work - maybe 'cos Fantom then assigns to a general 'Class' obj
 			// Anyway, just invoke it via reflection and all is okay
