@@ -87,8 +87,8 @@ using util::Random
 ** 
 ** Multi-Part Form Uploads
 ** =======================
-** SleepSafe will parse multipart form-data looking for the CSRF token. But in doing so note that the entire form data will be 
-** parsed twice, once by SleepSafe and again by your application - which may represent an overhead.
+** SleepSafe will parse multipart form-data looking for the CSRF token. But in doing so note that the entire HTTP Request body 
+** (form data) will be cached in memory and parsed twice, once by SleepSafe and again by your application - which may represent an overhead.
 ** 
 ** If this is not desirable, then you may also append the CSRF token as a URL query parameter. Although this may constitute a 
 ** minor security flaw / inconvenience as request URLs are often logged.
@@ -137,8 +137,9 @@ const class CsrfProtection : Protection {
 	@Inject	private const CsrfCrypto			crypto
 	@Inject	private const CsrfTokenGeneration	genFuncs
 	@Inject	private const CsrfTokenValidation	valFuncs
-	static	private const MimeType				mimeAppForm		:= MimeType("application/x-www-form-urlencoded")
-	static	private const MimeType				mimeTextPlain	:= MimeType("text/plain")
+	static	private const MimeType				mimeApplication	:= MimeType("application/x-www-form-urlencoded")
+	static	private const MimeType				mimePlainText	:= MimeType("text/plain")
+	static	private const MimeType				mimeMultipart	:= MimeType("multipart/form-data")
 
 	@Config	{ id="afSleepSafe.csrfTokenName" }
 			private const Str					tokenName
@@ -154,39 +155,53 @@ const class CsrfProtection : Protection {
 	}
 
 	private Str? doProtection() {
-		contentType := httpReq.headers.contentType.noParams
-		if (contentType == mimeAppForm || contentType == mimeTextPlain) {
-			
-			form := httpReq.body.form
-			if (form == null)
-				return csrfErr("No form data")
-			
-			csrfToken := form[tokenName]
-			if (csrfToken == null)
-				return csrfErr("Form does not contain '${tokenName}' key")
-			
-			hash := null as Str:Obj?
-			try {
-				fanCode	:= crypto.decode(csrfToken)
-				fanObj	:= fanCode.toBuf.readObj
-				hash	 = (Str:Obj?) fanObj
-			} catch (Err err)
-				return csrfErr("Invalid '${tokenName}' value")
-			
-			try
-				valFuncs.call(hash)
-			catch (Err err)
-				return csrfErr(err.msg)
+		csrfToken := null as Str
+
+		if (httpReq.url.query.containsKey(tokenName)) {
+			csrfToken = httpReq.url.query[tokenName]
+
+		} else {
+			contentType := httpReq.headers.contentType.noParams
+			if (contentType == mimeApplication || contentType == mimePlainText) {			
+				form := httpReq.body.form
+				if (form == null)
+					return csrfErr("No form data")
+				
+				csrfToken = form[tokenName]
+				if (csrfToken == null)
+					return csrfErr("Form does not contain '${tokenName}' key")
+	
+			} else {
+				httpReq.body.buf // cache the InStream so it may be re-read by the app later
+				httpReq.parseMultiPartForm |Str partName, InStream in, Str:Str headers| {
+					if (partName == tokenName)
+						csrfToken = in.readAllStr
+				}
+			}
 		}
+
+		hash := null as Str:Obj?
+		try {
+			fanCode	:= "using sys\n" + crypto.decode(csrfToken)
+			fanObj	:= fanCode.toBuf.readObj
+			hash	 = (Str:Obj?) fanObj
+		} catch (Err err)
+			return csrfErr("Invalid '${tokenName}' value")
+
+		try
+			valFuncs.call(hash)
+		catch (Err err)
+			return csrfErr(err.msg)
+
 		return null
 	}
 	
 	private Bool fromVunerableUrl() {
 		if (httpReq.httpMethod == "POST") {
-			contentType := httpReq.headers.contentType.noParams.toStr.lower
-			if (contentType == "application/x-www-form-urlencoded" ||
-				contentType == "text/plain" ||
-				contentType == "multipart/form-data")
+			contentType := httpReq.headers.contentType.noParams
+			if (contentType == mimeApplication ||
+				contentType == mimePlainText ||
+				contentType == mimeMultipart)
 				return true
 		}
 		return false
@@ -196,6 +211,9 @@ const class CsrfProtection : Protection {
 		hash := [:] { ordered = true }
 		genFuncs.call(hash)
 		code := Buf().writeObj(hash).flip.readAllStr
+		if (code.startsWith("[sys::Obj:sys::Obj?]"))
+			code = code[20..-1]
+		code = code.replace("sys::", "")
 		return crypto.encode(code)
 	}
 	

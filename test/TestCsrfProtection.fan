@@ -105,9 +105,35 @@ internal class TestCsrfProtection : SleepSafeTest {
 		verifyEq(res.body.str, "403 - Suspected CSRF attack - Invalid '_csrfToken' value")
 	}
 
-	// test plain-text
-	// test multipart
-	// test multipart uri query
+	Void testCsrfMultipartEnc() {
+		fireUp()
+		client.get(`/csrfMultipartHappy`)
+		res := Element("form").submitForm
+		verifyEq(res.statusCode, 200)
+		verifyEq(res.body.str, "Post, nom=val6")
+
+		client.get(`/csrfMultipartUnhappy`)
+		client.errOn4xx.enabled = false
+		res = Element("form").submitForm
+		verifyEq(res.statusCode, 403)
+		verifyEq(res.body.str, "403 - Suspected CSRF attack - Invalid '_csrfToken' value")
+	}
+
+	Void testCsrfQueryUri() {
+		fireUp()
+		client.get(`/csrfUriHappy`)
+		res := Element("form").submitForm
+		verifyEq(res.statusCode, 200)
+		verifyEq(res.body.str, "Post, nom=val6")
+
+		client.get(`/csrfUriUnhappy`)
+		client.errOn4xx.enabled = false
+		res = Element("form").submitForm
+		verifyEq(res.statusCode, 403)
+		verifyEq(res.body.str, "403 - Suspected CSRF attack - Invalid '_csrfToken' value")
+	}
+	
+	// session id texts
 }
 
 internal const class CustomGenFuncMod1 {
