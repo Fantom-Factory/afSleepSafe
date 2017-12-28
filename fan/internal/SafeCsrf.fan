@@ -1,4 +1,5 @@
 using afIoc::Inject
+using afIocConfig::Config
 using afBedSheet
 using util::Random
 
@@ -114,11 +115,16 @@ using util::Random
 ** 
 const class SafeCsrf : Protection {
 	
-	@Inject	private const HttpRequest		httpReq
-	@Inject	private const HttpResponse		httpRes
-	@Inject	private const HttpSession		httpSes
-	@Inject	private const CsrfCrypto		crypto
+	@Inject	private const HttpRequest			httpReq
+	@Inject	private const HttpResponse			httpRes
+	@Inject	private const HttpSession			httpSes
+	@Inject	private const CsrfCrypto			crypto
+	@Inject	private const CsrfTokenGeneration	genFuncs
+	@Inject	private const CsrfTokenValidation	valFuncs
 
+	@Config	{ id="afSleepSafe.csrfTokenName" }
+			private const Str					tokenName
+	
 //	@Config	private const Str				customHeaderName
 //	@Config	private const Regex				customHeaderValue	// note the RegEx! From Glob
 //			private const Random		random
@@ -133,47 +139,97 @@ const class SafeCsrf : Protection {
 		if (fromVunerableUrl) {
 //			checkReferrerAndOrigin	// deny if different - continue if not found
 //			okay if contains header
-			contentType := httpReq.headers.contentType
-			if (contentType.mediaType == "application" && contentType.subType == "x-www-form-urlencoded") {
-				form := httpReq.body.form
-				csrfToken	:= form["_csrfBuster"]
-				fanCode		:= crypto.decode(csrfToken)
-				fanObj		:= fanCode.toBuf.readObj
-				hash		:= (Str:Obj?) fanObj
-				
-				echo("GOT TS")
-			}
-//			checkCrsfToken
-//			deny if bad
+
+			ret = doProtection
 		}
 
-		csrfToken := 
-		httpReq.stash["afSleepSafe.csrfToken"] = generateToken
-		
+		httpReq.stash["afSleepSafe.csrfToken"]		= generateToken
+		httpReq.stash["afSleepSafe.csrfTokenFn"]	= #generateToken.func.bind([this])		
+		return ret
+	}
+
+	private Str? doProtection() {
+		contentType := httpReq.headers.contentType
+		if (contentType.mediaType == "application" && contentType.subType == "x-www-form-urlencoded") {
+			
+			form := httpReq.body.form
+			if (form == null)
+				return csrfErr("No form data")
+			
+			csrfToken := form[tokenName]
+			if (csrfToken == null)
+				return csrfErr("Form does not contain '${tokenName}' key")
+			
+			hash := null as Str:Obj?
+			try {
+				fanCode	:= crypto.decode(csrfToken)
+				fanObj	:= fanCode.toBuf.readObj
+				hash	 = (Str:Obj?) fanObj
+			} catch (Err err)
+				return csrfErr("Invalid '${tokenName}' token")
+			
+			echo("#######################")
+			echo("#######################")
+			echo(hash)
+			echo("#######################")
+			echo("#######################")
+			
+//			try
+				valFuncs.call(hash)
+//			catch (Err err)
+//				return csrfErr(err.msg)
+		}
 		return null
 	}
-
-	Bool fromVunerableUrl() {
-		if (httpReq.httpMethod != "POST")
-			return false
-
-		contentType := httpReq.headers.contentType.noParams.toStr.lower
-		if (contentType != "application/x-www-form-urlencoded" &&
-			contentType != "text/plain" &&
-			contentType != "multipart/form-data")
-			return false
-		
-		return true
+	
+	private Bool fromVunerableUrl() {
+		if (httpReq.httpMethod == "POST") {
+			contentType := httpReq.headers.contentType.noParams.toStr.lower
+			if (contentType == "application/x-www-form-urlencoded" ||
+				contentType == "text/plain" ||
+				contentType == "multipart/form-data")
+				return true
+		}
+		return false
 	}
 	
-	Str generateToken() {
+	private Str generateToken() {
+		hash := [:] { ordered = true }
+		genFuncs.call(hash)
+		code := Buf().writeObj(hash).flip.readAllStr
+		return crypto.encode(code)
+	}
+	
+	private Str csrfErr(Str msg) {
+		"Suspected CSRF attack - $msg"
+	}
+}
 
-		// FIXME contribute funcs
-		obj := [:] { ordered = true }
-		obj["timestamp"]		= DateTime.now(1sec)
-		if (httpSes.exists)
-			obj["sessionId"]	= httpSes.id
-		
-		return crypto.encode(Buf().writeObj(obj).flip.readAllStr)
+const class CsrfTokenGeneration {
+	private const |[Str:Obj?]|[] funcs
+
+	private new make(|[Str:Obj?]|[] funcs) {
+		this.funcs = funcs
+	}
+	
+	Void call(Str:Obj? hash) {
+		funcs.each { it.call(hash) }
+	}
+}
+
+const class CsrfTokenValidation {
+	private const |[Str:Obj?]|[] funcs
+
+	private new make(|[Str:Obj?]|[] funcs) {
+		this.funcs = funcs
+	}
+
+	Str? call(Str:Obj? hash) {
+		funcs.eachWhile |fn->Str?| {
+			try fn.call(hash)
+			catch (Err err)
+				return err.msg
+			return null
+		}
 	}
 }
