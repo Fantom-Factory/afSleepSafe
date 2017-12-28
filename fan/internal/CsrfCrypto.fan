@@ -17,26 +17,27 @@ internal const class CsrfCrypto {
 	@Inject { id="csrfKeyGen" }
 			private const Synchronized	thread
 	@Inject	private const IocEnv		iocEnv
-			private const AtomicRef		futureRef	:= AtomicRef(null)
-			private const AtomicRef		keyRef		:= AtomicRef(null)
+			private const AtomicRef		futureRef		:= AtomicRef(null)
+			private const AtomicRef		keyRef			:= AtomicRef(null)
 
 	private new make(|This| f) { f(this) }
 
 	** Because generating a secure key can take a good number of seconds, to speed up BedSheet start up times,
 	** we do it in the background.
 	Void generateKey() {
-		futureRef.val = thread.async |->Buf| {
+		futureRef.val = thread.async |->| {
 			passPhrase	:= "Fanny the Fantom -> Escape the Mainframe!"
 			salt		:= Buf.random(16)
 		    noOfBits	:= 128
 		    noOfBytes	:= noOfBits / 8
 		    iterations	:= iocEnv.isDev ? 0x10 : 0x10000
-		    return Buf.pbk("PBKDF2WithHmacSHA256", passPhrase, salt, iterations, noOfBytes).toImmutable
+		    keyBuf		:= Buf.pbk("PBKDF2WithHmacSHA256", passPhrase, salt, iterations, noOfBytes)
+			keyRef.val	= keyBuf.toImmutable
 		}
 	}
 	
 	Str encode(Str msg) {
-		keyBuf		:= secretKey
+		keyBuf	:= secretKey
 		keySpec	:= SecretKeySpec(toBytes(keyBuf), "AES")
 		cipher	:= Cipher.getInstance("AES/CBC/PKCS5Padding")
 		cipher.init(Cipher.ENCRYPT_MODE, keySpec)
@@ -49,7 +50,7 @@ internal const class CsrfCrypto {
 		cipherText	:= cipher.doFinal(toBytes(msg.toBuf))
 
 		// note the initVector is the same for repeated calls to getParameterSpec() but different for each instance of Cipher
-		return toBuf(initVector).toBase64Uri + toBuf(cipherText).toBase64Uri
+		return toBuf(initVector).toBase64Uri + toBuf(cipherText).toBase64Uri		
 	}
 
 	Str decode(Str encoded) {
@@ -77,9 +78,8 @@ internal const class CsrfCrypto {
 
 	** Returns the secret key. Blocks if it hasn't been generated yet.
 	private Buf secretKey() {
-		if (keyRef.val != null)
-			return keyRef.val
-		keyRef.val = ((Future) futureRef.val).get(30sec)
+		if (keyRef.val == null)
+			((Future) futureRef.val).get(30sec)
 		return keyRef.val
 	}
 }
