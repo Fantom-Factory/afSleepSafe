@@ -1,11 +1,15 @@
 using afIoc::Inject
+using afIocConfig::Config
 using afBedSheet
 
 internal const class SleepSafeMiddleware : Middleware {
 	
-	@Inject private const Log			log
-	@Inject private const HttpRequest	req
-	@Inject private const HttpResponse	res
+	@Inject private const Log					log
+	@Inject private const HttpRequest			req
+	@Inject private const HttpResponse			res
+	@Inject private const ResponseProcessors	resPros
+	@Config	private const Int					deniedStatusCode
+
 	
 	const Protection[] protection
 	
@@ -20,16 +24,12 @@ internal const class SleepSafeMiddleware : Middleware {
 	}
 	
 	override Void service(MiddlewarePipeline pipeline) {
+		denied := protection.eachWhile { it.protect(req, res) }
 		
-		protection.each {
-			it.protect(req, res)
-		}
-		
-		// 403 - Forbidden
-		// log str
-		// text/html application/xhtml
-		
-		pipeline.service
-		
+		if (denied != null) {
+			log.warn(denied)
+			resPros.processResponse(HttpStatus(deniedStatusCode, denied))
+		} else
+			pipeline.service
 	}
 }
