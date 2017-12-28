@@ -19,6 +19,7 @@ internal const class CsrfCrypto {
 	@Inject	private const IocEnv		iocEnv
 			private const AtomicRef		futureRef		:= AtomicRef(null)
 			private const AtomicRef		keyRef			:= AtomicRef(null)
+			private const AtomicRef		initVectorRef	:= AtomicRef(null)
 
 	private new make(|This| f) { f(this) }
 
@@ -33,6 +34,17 @@ internal const class CsrfCrypto {
 		    iterations	:= iocEnv.isDev ? 0x10 : 0x10000
 		    keyBuf		:= Buf.pbk("PBKDF2WithHmacSHA256", passPhrase, salt, iterations, noOfBytes)
 			keyRef.val	= keyBuf.toImmutable
+			
+			
+//			cipher	:= Cipher.getInstance("AES/CBC/PKCS5Padding")
+//			cipher.init(Cipher.ENCRYPT_MODE, keySpec)
+//	
+//			// getParameterSpec() has some knarly Java generics which I can't figure out how to create in Fantom : "<T extends AlgorithmParameterSpec>"
+//			// Note, java.lang.Class.asSubclass() does seem to work - maybe 'cos Fantom then assigns to a general 'Class' obj
+//			// Anyway, just invoke it via reflection and all is okay
+//			specClass	:= Class.forName("javax.crypto.spec.IvParameterSpec")
+//			initVector	:= ((IvParameterSpec) AlgorithmParameters#getParameterSpec.call(cipher.getParameters, specClass)).getIV
+//			initVectorRef.val = initVector
 		}
 	}
 	
@@ -48,9 +60,9 @@ internal const class CsrfCrypto {
 		specClass	:= Class.forName("javax.crypto.spec.IvParameterSpec")
 		initVector	:= ((IvParameterSpec) AlgorithmParameters#getParameterSpec.call(cipher.getParameters, specClass)).getIV
 		cipherText	:= cipher.doFinal(toBytes(msg.toBuf))
-
 		// note the initVector is the same for repeated calls to getParameterSpec() but different for each instance of Cipher
-		return toBuf(initVector).toBase64Uri + toBuf(cipherText).toBase64Uri		
+		token		:= toBuf(initVector).toBase64Uri + toBuf(cipherText).toBase64Uri
+		return token
 	}
 
 	Str decode(Str encoded) {

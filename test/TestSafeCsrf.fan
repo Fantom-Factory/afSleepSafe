@@ -2,6 +2,7 @@ using afBounce
 using afIoc::Contribute
 using afIoc::Configuration
 using concurrent::Actor
+using concurrent::AtomicRef
 
 internal class TestSafeCsrf : SleepSafeTest {
 	
@@ -70,22 +71,50 @@ internal class TestSafeCsrf : SleepSafeTest {
 		verifyEq(res.body.str, "403 - Suspected CSRF attack - Form does not contain 'peanut' key")
 	}
 
-//	Void testCustomGenFunc() {
-//		fail
-////		res := fireUp(null, CustomGenFuncMod#).get(`/csrfInvalid`)
-////		client.errOn4xx.enabled = false
-////		res = Element("form").submitForm
-////		
-////		verifyEq(res.statusCode, 403)
-////		verifyEq(res.body.str, "403 - Suspected CSRF attack - Invalid '_csrfToken' value")
-//	}
+	Void testCustomFuncs1() {
+		fireUp(null, CustomGenFuncMod1#)
+		client.get(`/csrfHappy`)
+		res := Element("form").submitForm
+		
+		verifyEq(res.statusCode, 200)
+		verifyEq(res.body.str, "Post, nom=val1")
+		verifyEq(CustomGenFuncMod1.customValRef.val, "Princess Daisy")
+	}
+
+	Void testCustomFuncs2() {
+		fireUp(null, CustomGenFuncMod2#)
+		client.get(`/csrfHappy`)
+		client.errOn4xx.enabled = false
+		res := Element("form").submitForm
+		
+		verifyEq(res.statusCode, 403)
+		verifyEq(res.body.str, "403 - Suspected CSRF attack - Custom Boom!")
+	}
 }
 
-internal const class CustomGenFuncMod {
+internal const class CustomGenFuncMod1 {
+	static const AtomicRef customValRef	:= AtomicRef(null)
+
 	@Contribute { serviceType=CsrfTokenGeneration# }
 	private Void contributeCsrfTokenGeneration(Configuration config) {
-//		config["timestamp"] = |Str:Obj? hash| {
-//			hash["timestamp"] = DateTime.now(1sec)
-//		}
+		config["custom"] = |Str:Obj? hash| {
+			hash["custom"] = "Princess Daisy"
+		}
 	}	
+
+	@Contribute { serviceType=CsrfTokenValidation# }
+	private Void contributeCsrfTokenValidation(Configuration config) {
+		config["custom"] = |Str:Obj? hash| {
+			customValRef.val = hash["custom"]
+		}
+	}
+}
+
+internal const class CustomGenFuncMod2 {
+	@Contribute { serviceType=CsrfTokenValidation# }
+	private Void contributeCsrfTokenValidation(Configuration config) {
+		config["custom"] = |Str:Obj? hash| {
+			throw Err("Custom Boom!")
+		}
+	}
 }
