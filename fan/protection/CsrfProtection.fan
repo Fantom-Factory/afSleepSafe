@@ -99,22 +99,38 @@ using util::Random
 ** *************
 ** 
 **   table:
-**   afIocConfig Key             Value
-**   --------------------------  ------------
-**   'afSleepSafe.frameOptions'  Defines who's allowed to embed the page in a frame. Set to 'deny' to forbid any embedding, 'sameorigin' to allow embedding from the same origin (default), or 'null' to disable.
+**   afIocConfig Key                 Value
+**   ---------------------------     ------------
+**   'afSleepSafe.csrfTokenName'     Name of the posted form field that holds the CSRF token. Defaults to '_csrfToken'.
+**   'afSleepSafe.csrfTokenTimeout'  How long CSRF tokens have to live. Set to 'null' to disable timeouts. Defaults to '60min'.
 ** 
 ** Example:
 ** 
 **   syntax: fantom 
+**   using afIoc::Contribute 
+**   using afIoc::Configuration
 **   using afIocConfig::ApplicationDefaults
 ** 
 **   @Contribute { serviceType=ApplicationDefaults# }
 **   Void contributeAppDefaults(Configuration config) {
-**       config["afSleepSafe.frameOptions"] = "deny"
+**       config["afSleepSafe.csrfTokenName"]    = "clickFast"
+**       config["afSleepSafe.csrfTokenTimeout"] = 2sec
 **   }
 ** 
-const class SafeCsrf : Protection {
-	
+** To disable, remove this class from the SleepSafeMiddleware configuration:
+** 
+**   syntax: fantom 
+**   using afIoc::Contribute 
+**   using afIoc::Configuration
+**   using afIocConfig::SleepSafeMiddleware
+** 
+**   @Contribute { serviceType=SleepSafeMiddleware# }
+**   Void contributeSleepSafeMiddleware(Configuration config) {
+**       config.remove("csrf")
+**   }
+** 
+const class CsrfProtection : Protection {
+
 	@Inject	private const HttpRequest			httpReq
 	@Inject	private const HttpResponse			httpRes
 	@Inject	private const HttpSession			httpSes
@@ -124,28 +140,15 @@ const class SafeCsrf : Protection {
 
 	@Config	{ id="afSleepSafe.csrfTokenName" }
 			private const Str					tokenName
-	
-//	@Config	private const Str				customHeaderName
-//	@Config	private const Regex				customHeaderValue	// note the RegEx! From Glob
-//			private const Random		random
-	
-	new make(|This| f) { f(this) }
-	
-	
+
+	private new make(|This| f) { f(this) }
+
 	@NoDoc
 	override Str? protect(HttpRequest httpReq, HttpResponse httpRes) {
-		
-		ret := null as Str
-		if (fromVunerableUrl) {
-//			checkReferrerAndOrigin	// deny if different - continue if not found
-//			okay if contains header
-
-			ret = doProtection
-		}
-
 		httpReq.stash["afSleepSafe.csrfToken"]		= generateToken
 		httpReq.stash["afSleepSafe.csrfTokenFn"]	= #generateToken.func.bind([this])		
-		return ret
+
+		return fromVunerableUrl ? doProtection : null
 	}
 
 	private Str? doProtection() {

@@ -9,25 +9,12 @@ const class SleepSafeModule {
 	
 	Void defineServices(RegistryBuilder bob) {
 		bob.addService(CsrfCrypto#)
+		bob.addService(SleepSafeMiddleware#)
 		bob.addService(CsrfTokenGeneration#)
 		bob.addService(CsrfTokenValidation#)
 	}
 
-	@Build
-	private SleepSafeMiddleware buildSleepSafeMiddleware(Scope scope, ConfigSource configSrc) {
-		protection := Protection[,]
-		
-		frameOptions := configSrc["afSleepSafe.frameOptions"]?.toStr
-		if (frameOptions != null)
-			protection.add(SafeFrameOptions(frameOptions))
-
-		// FIXME disable csrf?
-		protection.add(scope.build(SafeCsrf#))
-		
-		return scope.build(SleepSafeMiddleware#, [protection])
-	}
-
-	private Void onRegistryStartup(Configuration config) {
+	Void onRegistryStartup(Configuration config) {
 		scope := config.scope
 		config["csrfKeyGen"] = |->| {
 			crypto := (CsrfCrypto) scope.serviceById(CsrfCrypto#.qname)
@@ -35,8 +22,14 @@ const class SleepSafeModule {
 		}
 	}
 
+	@Contribute { serviceType=SleepSafeMiddleware# }
+	Void contributeSleepSafeMiddleware(Configuration config) {
+		config["xFrameOptions"]		= config.build(XFrameOptionsProtection#)
+		config["csrf"]				= config.build(CsrfProtection#)
+	}
+
 	@Contribute { serviceType=CsrfTokenGeneration# }
-	private Void contributeCsrfTokenGeneration(Configuration config, ConfigSource configSrc, HttpSession httpSession) {
+	Void contributeCsrfTokenGeneration(Configuration config, ConfigSource configSrc, HttpSession httpSession) {
 		config["timestamp"] = |Str:Obj? hash| {
 			timeoutResolution := (Duration?) configSrc.get("afSleepSafe.csrfTimeoutResolution", Duration#)
 			hash["timestamp"] = DateTime.now(timeoutResolution)
@@ -48,7 +41,7 @@ const class SleepSafeModule {
 	}
 
 	@Contribute { serviceType=CsrfTokenValidation# }
-	private Void contributeCsrfTokenValidation(Configuration config, ConfigSource configSrc) {
+	Void contributeCsrfTokenValidation(Configuration config, ConfigSource configSrc) {
 		config["timestamp"] = |Str:Obj? hash| {
 			timeout 			:= (Duration)  configSrc.get("afSleepSafe.csrfTokenTimeout", Duration#)
 			timeoutResolution	:= (Duration?) configSrc.get("afSleepSafe.csrfTimeoutResolution", Duration#)
@@ -59,14 +52,14 @@ const class SleepSafeModule {
 	}
 
 	@Contribute { serviceType=MiddlewarePipeline# }
-	private Void contributeMiddleware(Configuration config, SleepSafeMiddleware middleware) {
+	Void contributeMiddleware(Configuration config, SleepSafeMiddleware middleware) {
 		config.set("SleepSafeMiddleware", middleware).before("afBedSheet.routes")
 	}
 
 	@Contribute { serviceType=FactoryDefaults# }
 	private Void contributeFactoryDefaults(Configuration config) {
 		config["afSleepSafe.deniedStatusCode"]		= "403"
-		config["afSleepSafe.frameOptions"]			= "sameorigin"
+		config["afSleepSafe.xFrameOptions"]			= "sameorigin"
 		config["afSleepSafe.csrfTokenName"]			= "_csrfToken"
 		config["afSleepSafe.csrfTokenTimeout"]		= "2ms"
 		config["afSleepSafe.csrfTimeoutResolution"]	= "1sec"

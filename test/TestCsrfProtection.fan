@@ -4,7 +4,7 @@ using afIoc::Configuration
 using concurrent::Actor
 using concurrent::AtomicRef
 
-internal class TestSafeCsrf : SleepSafeTest {
+internal class TestCsrfProtection : SleepSafeTest {
 	
 	Void testCsrfHappy() {
 		fireUp
@@ -90,6 +90,12 @@ internal class TestSafeCsrf : SleepSafeTest {
 		verifyEq(res.statusCode, 403)
 		verifyEq(res.body.str, "403 - Suspected CSRF attack - Custom Boom!")
 	}
+	
+	// test plain-text
+	// test multipart
+	// test multipart uri query
+	
+	// test origin & custom header
 }
 
 internal const class CustomGenFuncMod1 {

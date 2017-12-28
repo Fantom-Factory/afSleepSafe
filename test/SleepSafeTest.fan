@@ -68,6 +68,7 @@ internal const class WebTestModule {
 		config.add(Route(`/csrfNoForm`,		Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'></form></body></html>")))
 		config.add(Route(`/csrfNotFound`,	Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'><input type='hidden' name='nom' value='val'></form></body></html>")))
 		config.add(Route(`/csrfInvalid`,	Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'><input type='hidden' name='_csrfToken' value='XXXXXXXX'></form></body></html>")))
+		config.add(Route(`/csrfCustomEnc`,	Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post' enctype='slimer/dude'><input type='hidden' name='_csrfToken' value='XXXXXXXX'><input type='hidden' name='nom' value='val4'></form></body></html>")))
 		config.add(Route(`/csrfCustomName`,	csrfCustomName))
 	}
 
