@@ -31,7 +31,7 @@ internal const class WebTestModule {
 	Void contributeRoutes(Configuration config) {
 		scope := config.scope
 
-		csrfHtml := "<!DOCTYPE html><html><body><form method='post' action='/post'><input name='nom' value='val1'><input type='hidden' name='_csrfToken' value='%{csrfToken}'></form></body></html>"
+		csrfHtml := "<!DOCTYPE html><html><body><form method='post' enctype='application/x-www-form-urlencoded' action='/post'><input name='nom' value='val1'><input type='hidden' name='_csrfToken' value='%{csrfToken}'></form></body></html>"
 
 		csrfHappy := |->Text| {
 			req := (HttpRequest) scope.serviceByType(HttpRequest#)
@@ -44,15 +44,18 @@ internal const class WebTestModule {
 			req := (HttpRequest) scope.serviceByType(HttpRequest#)
 			tok := (Str) req.stash["afSleepSafe.csrfToken"]
 			str := csrfHtml.replace("%{csrfToken}", tok).replace("_csrfToken", "peanut").replace("val1", "val3")
-			echo(str)
-			echo(str)
-			echo(str)
-			echo(str)
-			echo(str)
-			echo(str)
-			echo(str)
-			echo(str)
-			echo(str)
+			return Text.fromHtml(str)
+		}.toImmutable
+
+		csrfPlainTextHappy := |->Text| {
+			req := (HttpRequest) scope.serviceByType(HttpRequest#)
+			tok := (Str) req.stash["afSleepSafe.csrfToken"]
+			str := csrfHtml.replace("%{csrfToken}", tok).replace("val1", "val5").replace("application/x-www-form-urlencoded", "text/plain")
+			return Text.fromHtml(str)
+		}.toImmutable
+
+		csrfPlainTextUnhappy := |->Text| {
+			str := csrfHtml.replace("%{csrfToken}", "XXXXXX").replace("application/x-www-form-urlencoded", "text/plain")
 			return Text.fromHtml(str)
 		}.toImmutable
 
@@ -61,15 +64,16 @@ internal const class WebTestModule {
 			return Text.fromPlain("Post, nom=" + req.body.form["nom"])
 		}.toImmutable
 
-		config.add(Route(`/get`,			Text.fromPlain("Okay")))
-		config.add(Route(`/post`,			postFn, "POST"))
-
-		config.add(Route(`/csrfHappy`, 		csrfHappy))
-		config.add(Route(`/csrfNoForm`,		Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'></form></body></html>")))
-		config.add(Route(`/csrfNotFound`,	Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'><input type='hidden' name='nom' value='val'></form></body></html>")))
-		config.add(Route(`/csrfInvalid`,	Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'><input type='hidden' name='_csrfToken' value='XXXXXXXX'></form></body></html>")))
-		config.add(Route(`/csrfCustomEnc`,	Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post' enctype='slimer/dude'><input type='hidden' name='_csrfToken' value='XXXXXXXX'><input type='hidden' name='nom' value='val4'></form></body></html>")))
-		config.add(Route(`/csrfCustomName`,	csrfCustomName))
+		config.add(Route(`/get`,				Text.fromPlain("Okay")))
+		config.add(Route(`/post`,				postFn, "POST"))
+		config.add(Route(`/csrfHappy`, 			csrfHappy))
+		config.add(Route(`/csrfNoForm`,			Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'></form></body></html>")))
+		config.add(Route(`/csrfNotFound`,		Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'><input type='hidden' name='nom' value='val'></form></body></html>")))
+		config.add(Route(`/csrfInvalid`,		Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'><input type='hidden' name='_csrfToken' value='XXXXXXXX'></form></body></html>")))
+		config.add(Route(`/csrfCustomEnc`,		Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post' enctype='slimer/dude'><input type='hidden' name='_csrfToken' value='XXXXXXXX'><input type='hidden' name='nom' value='val4'></form></body></html>")))
+		config.add(Route(`/csrfCustomName`,		csrfCustomName))
+		config.add(Route(`/csrfPlainHappy`,		csrfPlainTextHappy))
+		config.add(Route(`/csrfPlainUnhappy`,	csrfPlainTextUnhappy))
 	}
 
 	@Contribute { serviceType=ApplicationDefaults# }

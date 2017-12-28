@@ -137,6 +137,8 @@ const class CsrfProtection : Protection {
 	@Inject	private const CsrfCrypto			crypto
 	@Inject	private const CsrfTokenGeneration	genFuncs
 	@Inject	private const CsrfTokenValidation	valFuncs
+	static	private const MimeType				mimeAppForm		:= MimeType("application/x-www-form-urlencoded")
+	static	private const MimeType				mimeTextPlain	:= MimeType("text/plain")
 
 	@Config	{ id="afSleepSafe.csrfTokenName" }
 			private const Str					tokenName
@@ -152,8 +154,8 @@ const class CsrfProtection : Protection {
 	}
 
 	private Str? doProtection() {
-		contentType := httpReq.headers.contentType
-		if (contentType.mediaType == "application" && contentType.subType == "x-www-form-urlencoded") {
+		contentType := httpReq.headers.contentType.noParams
+		if (contentType == mimeAppForm || contentType == mimeTextPlain) {
 			
 			form := httpReq.body.form
 			if (form == null)

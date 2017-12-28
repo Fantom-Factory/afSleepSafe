@@ -80,7 +80,7 @@ internal const class CsrfCrypto {
 
 	** Returns the secret key. Blocks if it hasn't been generated yet.
 	private Buf secretKey() {
-		if (keyRef.val == null)
+		if (keyRef.val == null || initVectorRef.val == null)
 			((Future) futureRef.val).get(30sec)
 		return keyRef.val
 	}

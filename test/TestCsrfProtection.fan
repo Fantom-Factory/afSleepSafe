@@ -71,7 +71,7 @@ internal class TestCsrfProtection : SleepSafeTest {
 		verifyEq(res.body.str, "403 - Suspected CSRF attack - Form does not contain 'peanut' key")
 	}
 
-	Void testCustomFuncs1() {
+	Void testCsrfCustomFuncs1() {
 		fireUp(null, CustomGenFuncMod1#)
 		client.get(`/csrfHappy`)
 		res := Element("form").submitForm
@@ -81,7 +81,7 @@ internal class TestCsrfProtection : SleepSafeTest {
 		verifyEq(CustomGenFuncMod1.customValRef.val, "Princess Daisy")
 	}
 
-	Void testCustomFuncs2() {
+	Void testCsrfCustomFuncs2() {
 		fireUp(null, CustomGenFuncMod2#)
 		client.get(`/csrfHappy`)
 		client.errOn4xx.enabled = false
@@ -90,12 +90,24 @@ internal class TestCsrfProtection : SleepSafeTest {
 		verifyEq(res.statusCode, 403)
 		verifyEq(res.body.str, "403 - Suspected CSRF attack - Custom Boom!")
 	}
-	
+
+	Void testCsrfPlainTextEnc() {
+		fireUp()
+		client.get(`/csrfPlainHappy`)
+		res := Element("form").submitForm
+		verifyEq(res.statusCode, 200)
+		verifyEq(res.body.str, "Post, nom=val5")
+
+		client.get(`/csrfPlainUnhappy`)
+		client.errOn4xx.enabled = false
+		res = Element("form").submitForm
+		verifyEq(res.statusCode, 403)
+		verifyEq(res.body.str, "403 - Suspected CSRF attack - Invalid '_csrfToken' value")
+	}
+
 	// test plain-text
 	// test multipart
 	// test multipart uri query
-	
-	// test origin & custom header
 }
 
 internal const class CustomGenFuncMod1 {
