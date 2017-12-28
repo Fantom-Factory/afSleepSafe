@@ -2,7 +2,7 @@ using afIoc::Inject
 using afIocConfig::Config
 using afBedSheet
 
-internal const class SleepSafeMiddleware : Middleware {
+const class SleepSafeMiddleware : Middleware {
 	
 	@Inject private const Log					log
 	@Inject private const HttpRequest			req

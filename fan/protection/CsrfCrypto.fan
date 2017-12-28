@@ -35,47 +35,37 @@ internal const class CsrfCrypto {
 		    keyBuf		:= Buf.pbk("PBKDF2WithHmacSHA256", passPhrase, salt, iterations, noOfBytes)
 			keyRef.val	= keyBuf.toImmutable
 			
-			
-//			cipher	:= Cipher.getInstance("AES/CBC/PKCS5Padding")
-//			cipher.init(Cipher.ENCRYPT_MODE, keySpec)
-//	
-//			// getParameterSpec() has some knarly Java generics which I can't figure out how to create in Fantom : "<T extends AlgorithmParameterSpec>"
-//			// Note, java.lang.Class.asSubclass() does seem to work - maybe 'cos Fantom then assigns to a general 'Class' obj
-//			// Anyway, just invoke it via reflection and all is okay
-//			specClass	:= Class.forName("javax.crypto.spec.IvParameterSpec")
-//			initVector	:= ((IvParameterSpec) AlgorithmParameters#getParameterSpec.call(cipher.getParameters, specClass)).getIV
-//			initVectorRef.val = initVector
+			keySpec	:= SecretKeySpec(toBytes(keyRef.val), "AES")
+			cipher	:= Cipher.getInstance("AES/CBC/PKCS5Padding")
+			cipher.init(Cipher.ENCRYPT_MODE, keySpec)
+	
+			// getParameterSpec() has some knarly Java generics which I can't figure out how to create in Fantom : "<T extends AlgorithmParameterSpec>"
+			// Note, java.lang.Class.asSubclass() does seem to work - maybe 'cos Fantom then assigns to a general 'Class' obj
+			// Anyway, just invoke it via reflection and all is okay
+			specClass	:= Class.forName("javax.crypto.spec.IvParameterSpec")
+			initVector	:= ((IvParameterSpec) AlgorithmParameters#getParameterSpec.call(cipher.getParameters, specClass)).getIV
+			initVectorRef.val = toBuf(initVector).toImmutable
 		}
 	}
-	
-	Str encode(Str msg) {
-		keyBuf	:= secretKey
-		keySpec	:= SecretKeySpec(toBytes(keyBuf), "AES")
-		cipher	:= Cipher.getInstance("AES/CBC/PKCS5Padding")
-		cipher.init(Cipher.ENCRYPT_MODE, keySpec)
 
-		// getParameterSpec() has some knarly Java generics which I can't figure out how to create in Fantom : "<T extends AlgorithmParameterSpec>"
-		// Note, java.lang.Class.asSubclass() does seem to work - maybe 'cos Fantom then assigns to a general 'Class' obj
-		// Anyway, just invoke it via reflection and all is okay
-		specClass	:= Class.forName("javax.crypto.spec.IvParameterSpec")
-		initVector	:= ((IvParameterSpec) AlgorithmParameters#getParameterSpec.call(cipher.getParameters, specClass)).getIV
+	Str encode(Str msg) {
+		keyBuf		:= secretKey
+		keySpec		:= SecretKeySpec(toBytes(keyBuf), "AES")
+		cipher		:= Cipher.getInstance("AES/CBC/PKCS5Padding")
+		ivSpec		:= IvParameterSpec(toBytes(initVectorRef.val))
+		cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
 		cipherText	:= cipher.doFinal(toBytes(msg.toBuf))
-		// note the initVector is the same for repeated calls to getParameterSpec() but different for each instance of Cipher
-		token		:= toBuf(initVector).toBase64Uri + toBuf(cipherText).toBase64Uri
+		token		:= toBuf(cipherText).toBase64Uri
 		return token
 	}
 
-	Str decode(Str encoded) {
-		initSize	:= 22
+	Str decode(Str cipherText) {
 		keyBuf		:= secretKey
-		initVector	:= encoded[0..<initSize]
-		cipherText	:= encoded[initSize..-1]
 		keySpec		:= SecretKeySpec(toBytes(keyBuf), "AES")
 		cipher		:= Cipher.getInstance("AES/CBC/PKCS5Padding")
-		ivSpec		:= IvParameterSpec(toBytes(Buf.fromBase64(initVector)))
+		ivSpec		:= IvParameterSpec(toBytes(initVectorRef.val))
 		cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
 		plainText	:= cipher.doFinal(toBytes(Buf.fromBase64(cipherText)))
-
 		return toBuf(plainText).readAllStr.trim
 	}
 
