@@ -166,18 +166,12 @@ const class SafeCsrf : Protection {
 				fanObj	:= fanCode.toBuf.readObj
 				hash	 = (Str:Obj?) fanObj
 			} catch (Err err)
-				return csrfErr("Invalid '${tokenName}' token")
+				return csrfErr("Invalid '${tokenName}' value")
 			
-			echo("#######################")
-			echo("#######################")
-			echo(hash)
-			echo("#######################")
-			echo("#######################")
-			
-//			try
+			try
 				valFuncs.call(hash)
-//			catch (Err err)
-//				return csrfErr(err.msg)
+			catch (Err err)
+				return csrfErr(err.msg)
 		}
 		return null
 	}
@@ -224,12 +218,7 @@ const class CsrfTokenValidation {
 		this.funcs = funcs
 	}
 
-	Str? call(Str:Obj? hash) {
-		funcs.eachWhile |fn->Str?| {
-			try fn.call(hash)
-			catch (Err err)
-				return err.msg
-			return null
-		}
+	Void call(Str:Obj? hash) {
+		funcs.each { it.call(hash) }
 	}
 }
