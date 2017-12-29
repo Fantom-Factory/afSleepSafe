@@ -167,7 +167,7 @@ const class CsrfTokenGuard : Guard {
 		httpReq.stash["afSleepSafe.csrfToken"]		= generateToken
 		httpReq.stash["afSleepSafe.csrfTokenFn"]	= #generateToken.func.bind([this])		
 
-		return fromVunerableUrl ? doProtection : null
+		return fromVunerableUrl(httpReq) ? doProtection : null
 	}
 
 	private Str? doProtection() {
@@ -213,9 +213,9 @@ const class CsrfTokenGuard : Guard {
 		return null
 	}
 	
-	private Bool fromVunerableUrl() {
+	internal static Bool fromVunerableUrl(HttpRequest httpReq) {
 		if (httpReq.httpMethod == "POST") {
-			contentType := httpReq.headers.contentType.noParams
+			contentType := httpReq.headers.contentType?.noParams
 			if (contentType == mimeApplication ||
 				contentType == mimePlainText ||
 				contentType == mimeMultipart)
