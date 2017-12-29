@@ -118,6 +118,15 @@ internal const class WebTestModule {
 		appConfig?.each |v, k| { config[k] = v }
 	}
 
+	Void onRegistryStartup(Configuration config) {
+		config.remove("afIoc.logBanner",		"afIoc.silentBanner")
+		config.remove("afIoc.logServices",		"afIoc.silentServices")
+		config.remove("afIoc.logStartupTimes",	"afIoc.silentStartupTimes")
+	}
+	Void onRegistryShutdown(Configuration config) {
+		config.remove("afIoc.sayGoodbye", "afIoc.silentBoodbye")
+	}
+
 //	@Override
 //	IocEnv overrideIocEnv() {
 //        IocEnv.fromStr("Testing")

@@ -117,7 +117,7 @@ using util::Random
 **       config["afSleepSafe.csrfTokenTimeout"] = 2sec
 **   }
 ** 
-** To disable, remove this class from the SleepSafeMiddleware configuration:
+** To disable CSRF checking, remove this class from the 'SleepSafeMiddleware' configuration:
 ** 
 **   syntax: fantom 
 **   using afIoc::Contribute 
@@ -182,7 +182,8 @@ const class CsrfProtection : Protection {
 
 		hash := null as Str:Obj?
 		try {
-			fanCode	:= "using sys\n" + crypto.decode(csrfToken)
+			fanRaw	:= crypto.decode(csrfToken)
+			fanCode	:= "using sys\n[\"${fanRaw}]"
 			fanObj	:= fanCode.toBuf.readObj
 			hash	 = (Str:Obj?) fanObj
 		} catch (Err err)
@@ -210,10 +211,13 @@ const class CsrfProtection : Protection {
 	private Str generateToken() {
 		hash := [:] { ordered = true }
 		genFuncs.call(hash)
+		
 		code := Buf().writeObj(hash).flip.readAllStr
 		if (code.startsWith("[sys::Obj:sys::Obj?]"))
 			code = code[20..-1]
 		code = code.replace("sys::", "")
+		code = code[2..<-1]
+
 		return crypto.encode(code)
 	}
 	

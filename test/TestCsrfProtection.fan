@@ -47,7 +47,7 @@ internal class TestCsrfProtection : SleepSafeTest {
 	}
 
 	Void testCsrfTokenTimeout() {
-		fireUp(["afSleepSafe.csrfTimeoutResolution":null, "afSleepSafe.csrfTokenTimeout":"20ms"])
+		fireUp(["afSleepSafe.csrfTokenTimeout":"20ms"])
 		client.get(`/csrfHappy`)
 		client.errOn4xx.enabled = false
 		Actor.sleep(30ms)
