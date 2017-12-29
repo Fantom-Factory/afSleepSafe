@@ -25,6 +25,7 @@ const class SleepSafeModule {
 	@Contribute { serviceType=SleepSafeMiddleware# }
 	Void contributeSleepSafeMiddleware(Configuration config) {
 		config["xFrameOptions"]		= config.build(XFrameOptionsGuard#)
+		config["csrfSameOrigin"]	= config.build(CsrfSameOriginGuard#)
 		config["csrfToken"]			= config.build(CsrfTokenGuard#)
 	}
 
@@ -73,7 +74,7 @@ const class SleepSafeModule {
 		config["afSleepSafe.deniedStatusCode"]		= "403"
 		config["afSleepSafe.xFrameOptions"]			= "sameorigin"
 		config["afSleepSafe.csrfTokenName"]			= "_csrfToken"
-		config["afSleepSafe.csrfTokenTimeout"]		= "200ms"
+		config["afSleepSafe.csrfTokenTimeout"]		= "60min"
 	}
 
 	@Contribute { serviceType=ActorPools# }
