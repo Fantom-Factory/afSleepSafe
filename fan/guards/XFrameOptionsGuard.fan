@@ -2,7 +2,7 @@ using afIocConfig::Config
 using afBedSheet::HttpRequest
 using afBedSheet::HttpResponse
 
-** Protects against clickjacking by setting an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame.
+** Guards against clickjacking by setting an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame.
 ** 
 **   table:
 **   --------------------------  ------------
@@ -43,14 +43,14 @@ using afBedSheet::HttpResponse
 **       config.remove("xFrameOptions")
 **   }
 ** 
-const class XFrameOptionsProtection : Protection {
+const class XFrameOptionsGuard : Guard {
 	
 	@Config	private const Str? xFrameOptions
 	
 	private new make(|This| f) { f(this) }
 	
 	@NoDoc
-	override Str? protect(HttpRequest httpReq, HttpResponse httpRes) {
+	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		httpRes.headers.xFrameOptions = xFrameOptions
 		return null
 	}

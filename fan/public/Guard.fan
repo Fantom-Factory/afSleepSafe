@@ -1,12 +1,12 @@
 using afBedSheet::HttpRequest
 using afBedSheet::HttpResponse
 
-const mixin Protection {
+const mixin Guard {
 	
 	Str violateStr(Str what) {
 		"Potential ${what} violation"
 	}
 	
-	abstract Str? protect(HttpRequest req, HttpResponse res)
+	abstract Str? guard(HttpRequest req, HttpResponse res)
 	
 }

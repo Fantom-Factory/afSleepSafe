@@ -3,7 +3,7 @@ using afIocConfig::Config
 using afBedSheet
 using util::Random
 
-** Protects against CSRF attacks by enforcing an customisable [Encrypted Token Pattern]`https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Encrypted_Token_Pattern` strategy.
+** Guards against CSRF attacks by enforcing an customisable [Encrypted Token Pattern]`https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Encrypted_Token_Pattern` strategy.
 **
 ** 
 **  
@@ -129,7 +129,7 @@ using util::Random
 **       config.remove("csrf")
 **   }
 ** 
-const class CsrfProtection : Protection {
+const class CsrfGuard : Guard {
 
 	@Inject	private const HttpRequest			httpReq
 	@Inject	private const HttpResponse			httpRes
@@ -147,7 +147,7 @@ const class CsrfProtection : Protection {
 	private new make(|This| f) { f(this) }
 
 	@NoDoc
-	override Str? protect(HttpRequest httpReq, HttpResponse httpRes) {
+	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		httpReq.stash["afSleepSafe.csrfToken"]		= generateToken
 		httpReq.stash["afSleepSafe.csrfTokenFn"]	= #generateToken.func.bind([this])		
 

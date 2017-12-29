@@ -1,5 +1,5 @@
 
-internal class TestXFrameOptionsProtection : SleepSafeTest {
+internal class TestXFrameOptionsGuard : SleepSafeTest {
 	
 	Void testDefaultConfig() {
 		res := fireUp.get(`/get`)

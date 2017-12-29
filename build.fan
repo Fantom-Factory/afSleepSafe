@@ -33,7 +33,7 @@ class Build : BuildPod {
 			"afBounce     1.1.6  - 1.1",
 		]
 
-		srcDirs = [`fan/`, `fan/advanced/`, `fan/protection/`, `fan/protection/wip/`, `fan/public/`, `test/`]
+		srcDirs = [`fan/`, `fan/guards/`, `fan/guards/wip/`, `fan/internal/`, `fan/public/`, `test/`]
 		resDirs = [`doc/`]
 		
 		meta["afBuild.testPods"]	= "afBounce concurrent"

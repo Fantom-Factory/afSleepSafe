@@ -2,6 +2,7 @@ using afIoc::Inject
 using afIocConfig::Config
 using afBedSheet
 
+** BedSheet middleware that is run before any BedSheet routing.  
 const class SleepSafeMiddleware : Middleware {
 	
 	@Inject private const Log					log
@@ -11,10 +12,10 @@ const class SleepSafeMiddleware : Middleware {
 	@Config	private const Int					deniedStatusCode
 
 	
-	const Protection[] protection
+	const Guard[] guards
 	
-	new make(Protection[] protection, |This| f) {
-		this.protection = protection
+	new make(Guard[] guards, |This| f) {
+		this.guards = guards
 		f(this)
 		
 		msg := "\n\n"
@@ -24,7 +25,7 @@ const class SleepSafeMiddleware : Middleware {
 	}
 	
 	override Void service(MiddlewarePipeline pipeline) {
-		denied := protection.eachWhile { it.protect(req, res) }
+		denied := guards.eachWhile { it.guard(req, res) }
 		
 		if (denied != null) {
 			log.warn(denied)	// TODO fandoc this warn
