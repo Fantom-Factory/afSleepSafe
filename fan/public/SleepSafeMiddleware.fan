@@ -27,7 +27,7 @@ const class SleepSafeMiddleware : Middleware {
 		denied := protection.eachWhile { it.protect(req, res) }
 		
 		if (denied != null) {
-			log.warn(denied)
+			log.warn(denied)	// TODO fandoc this warn
 			resPros.processResponse(HttpStatus(deniedStatusCode, denied))
 		} else
 			pipeline.service
