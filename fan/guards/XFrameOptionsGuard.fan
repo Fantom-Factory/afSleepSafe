@@ -2,7 +2,7 @@ using afIocConfig::Config
 using afBedSheet::HttpRequest
 using afBedSheet::HttpResponse
 
-** Guards against clickjacking by setting an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame.
+** Guards against clickjacking by setting an 'X-Frame-Options' HTTP response header that tells browsers not to embed the page in a frame.
 ** 
 ** The 'X-Frame-Options' HTTP header is support by Internet Explorer 8, Firefox 3.6.9, Opera 10.50, Safari 4.0, Chrome 4.1.249.1042.
 ** 
