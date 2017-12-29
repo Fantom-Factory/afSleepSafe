@@ -35,7 +35,7 @@ const class SleepSafeModule {
 		}
 		config["sessionId"] = |Str:Obj? hash| {
 			if (httpSession.exists)
-				hash["sessionId"] = httpSession.id
+				hash["sId"] = httpSession.id
 		}
 	}
 
