@@ -31,8 +31,7 @@ const class SleepSafeModule {
 	@Contribute { serviceType=CsrfTokenGeneration# }
 	Void contributeCsrfTokenGeneration(Configuration config, ConfigSource configSrc, HttpSession httpSession) {
 		config["timestamp"] = |Str:Obj? hash| {
-			timeoutResolution := (Duration?) configSrc.get("afSleepSafe.csrfTimeoutResolution", Duration#)
-			hash["timestamp"] = DateTime.nowUtc(timeoutResolution)
+			hash["ts"] = Base64.toB64(DateTime.nowTicks / 1ms.ticks)
 		}
 		config["sessionId"] = |Str:Obj? hash| {
 			if (httpSession.exists)
@@ -43,9 +42,9 @@ const class SleepSafeModule {
 	@Contribute { serviceType=CsrfTokenValidation# }
 	Void contributeCsrfTokenValidation(Configuration config, ConfigSource configSrc) {
 		config["timestamp"] = |Str:Obj? hash| {
-			timeout 			:= (Duration)  configSrc.get("afSleepSafe.csrfTokenTimeout", Duration#)
-			timeoutResolution	:= (Duration?) configSrc.get("afSleepSafe.csrfTimeoutResolution", Duration#)
-			duration := DateTime.nowUtc(timeoutResolution) - ((DateTime) hash["timestamp"])
+			timeout 	:= (Duration)  configSrc.get("afSleepSafe.csrfTokenTimeout", Duration#)
+			timestamp	:= Base64.fromB64(hash.get("ts", "0")) * 1ms.ticks
+			duration	:= Duration(DateTime.nowTicks - timestamp)
 			if (duration >= timeout)
 				throw Err("Token exceeds ${timeout} timeout: ${duration}")
 		}
@@ -61,8 +60,7 @@ const class SleepSafeModule {
 		config["afSleepSafe.deniedStatusCode"]		= "403"
 		config["afSleepSafe.xFrameOptions"]			= "sameorigin"
 		config["afSleepSafe.csrfTokenName"]			= "_csrfToken"
-		config["afSleepSafe.csrfTokenTimeout"]		= "2ms"
-		config["afSleepSafe.csrfTimeoutResolution"]	= "1sec"
+		config["afSleepSafe.csrfTokenTimeout"]		= "200ms"
 	}
 
 	@Contribute { serviceType=ActorPools# }

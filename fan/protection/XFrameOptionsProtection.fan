@@ -31,7 +31,7 @@ using afBedSheet::HttpResponse
 **       config["afSleepSafe.xFrameOptions"] = "deny"
 **   }
 ** 
-** To disable, remove this class from the SleepSafeMiddleware configuration:
+** To disable, remove this class from the 'SleepSafeMiddleware' configuration:
 ** 
 **   syntax: fantom 
 **   using afIoc::Contribute 
