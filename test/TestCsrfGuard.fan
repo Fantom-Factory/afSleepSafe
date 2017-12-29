@@ -5,7 +5,7 @@ using afBedSheet
 using concurrent::Actor
 using concurrent::AtomicRef
 
-internal class TestCsrfProtection : SleepSafeTest {
+internal class TestCsrfGuard : SleepSafeTest {
 	
 	Void testCsrfHappy() {
 		fireUp([CsrfTestModule#])
