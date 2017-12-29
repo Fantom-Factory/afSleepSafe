@@ -39,7 +39,7 @@ using util::Random
 ** When rendering a HTML form you must include the following input:
 ** 
 **   syntax: html
-**   <input type="hidden" name="_csrfBuster" value="XXXX-XXXX-XXXX-XXXX">
+**   <input type="hidden" name="_csrfToken" value="XXXX-XXXX-XXXX-XXXX">
 ** 
 ** where 'value' is obtained from:
 ** 
@@ -48,40 +48,16 @@ using util::Random
 ** 
 ** SleepSafe adds the CSRF token to the stash at the start of every request.
 ** 
-** When the form is submitted SleepSafe inspects all POST requests with a content type of either:
+** Note that [FormBean]`pod:afFormBean` will automatically add the hidden input to every rendered form.
+** 
+** When the form is submitted SleepSafe inspects all POST requests with a content type of:
 **  - 'application/x-www-form-urlencoded'
 **  - 'multipart/form-data'
 **  - 'text/plain'
-** and checks and validates the '_csrfBuster' token value.
+** and checks and validates the '_csrfToken' token value.
 ** 
-** Other content types can not be submitted by HTML forms and as such, are not subject to CSRF attacks and are not checked by
+** Other content types can not be submitted by HTML forms and as such, are not subject to CSRF attacks, and are not checked by
 ** SleepSafe.
-** 
-** 
-** 
-** Origin HTTP Request Header
-** ==========================
-** SleepSafe can optionally skip token checks if the request contains an 'Origin' header that matches the BedSheet configured host. 
-** 'Origin' is a browser controller request header that can be trusted within the context of CSRF attacks. 
-** If the 'Origin' header matches the BedSheet host, then the request was initiated by content from this server and the request
-** can be trusted.
-** 
-** Note that the default BedSheet host of 'localhost' is not trusted and requests with such 'Origin' values are still subject
-** to CSRF token checks.    
-** 
-** This is disabled by default as *not* checking the CSRF token could leave you vulnerable to other non-CSRF attacks.
-**
-**  
-** 
-** Custom HTTP Request Headers
-** ===========================
-** SleepSafe can optionally skip token checks if the request contains a named custom header, such as 'X-Requested-With: XMLHttpRequest'.
-** 
-** That's because custom headers can only be set via [XMLHttpRequest]`https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/setRequestHeader`
-** and 'XMLHttpRequests' are subject to the [Same Origin Policy]`https://en.wikipedia.org/wiki/XMLHttpRequest#Cross-domain_requests`.
-** Hence it is impossible for an attacker to submit custom headers in a CSRF attack.
-** 
-** This is disabled by default as *not* checking the CSRF token could leave you vulnerable to other non-CSRF attacks.
 ** 
 ** 
 ** 
@@ -95,8 +71,8 @@ using util::Random
 ** 
 ** 
 ** 
-** Configuration
-** *************
+** Ioc Configuration
+** *****************
 ** 
 **   table:
 **   afIocConfig Key                 Value
@@ -107,10 +83,6 @@ using util::Random
 ** Example:
 ** 
 **   syntax: fantom 
-**   using afIoc::Contribute 
-**   using afIoc::Configuration
-**   using afIocConfig::ApplicationDefaults
-** 
 **   @Contribute { serviceType=ApplicationDefaults# }
 **   Void contributeAppDefaults(Configuration config) {
 **       config["afSleepSafe.csrfTokenName"]    = "clickFast"
@@ -120,16 +92,59 @@ using util::Random
 ** To disable CSRF checking, remove this class from the 'SleepSafeMiddleware' configuration:
 ** 
 **   syntax: fantom 
-**   using afIoc::Contribute 
-**   using afIoc::Configuration
-**   using afIocConfig::SleepSafeMiddleware
-** 
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config) {
 **       config.remove("csrf")
 **   }
 ** 
+** To add custom data to the CSRF token hash:
+** 
+** @Contribute { serviceType=CsrfTokenGeneration# }
+** private Void contributeCsrfTokenGeneration(Configuration config) {
+**     config["user"] = |Str:Obj? hash| {
+**         hash["user"] = "Princess Daisy"
+**     }
+** }
+** 
+** Then to verify the custom data in the token hash:
+** 
+** @Contribute { serviceType=CsrfTokenValidation# }
+** private Void contributeCsrfTokenValidation(Configuration config) {
+**     config["user"] = |Str:Obj? hash| {
+**         if (hash.containsKey["user"])
+**             if (hash["user"] != "Princess Daisy")
+**                 throw Err("User is not a Princess!")
+**     }
+** }
+**  
+** 
 const class CsrfGuard : Guard {
+
+	// Docs for features not-implemented! If they're disabled by default, then they're not very useful. 
+	//
+	// Origin HTTP Request Header
+	// ==========================
+	// SleepSafe can optionally skip token checks if the request contains an 'Origin' header that matches the BedSheet configured host. 
+	// 'Origin' is a browser controller request header that can be trusted within the context of CSRF attacks. 
+	// If the 'Origin' header matches the BedSheet host, then the request was initiated by content from this server and the request
+	// can be trusted.
+	// 
+	// Note that the default BedSheet host of 'localhost' is not trusted and requests with such 'Origin' values are still subject
+	// to CSRF token checks.    
+	// 
+	// This is disabled by default as *not* checking the CSRF token could leave you vulnerable to other non-CSRF attacks.
+	//
+	//  
+	// 
+	// Custom HTTP Request Headers
+	// ===========================
+	// SleepSafe can optionally skip token checks if the request contains a named custom header, such as 'X-Requested-With: XMLHttpRequest'.
+	// 
+	// That's because custom headers can only be set via [XMLHttpRequest]`https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/setRequestHeader`
+	// and 'XMLHttpRequests' are subject to the [Same Origin Policy]`https://en.wikipedia.org/wiki/XMLHttpRequest#Cross-domain_requests`.
+	// Hence it is impossible for an attacker to submit custom headers in a CSRF attack.
+	// 
+	// This is disabled by default as *not* checking the CSRF token could leave you vulnerable to other non-CSRF attacks.
 
 	@Inject	private const HttpRequest			httpReq
 	@Inject	private const HttpResponse			httpRes
@@ -226,6 +241,7 @@ const class CsrfGuard : Guard {
 	}
 }
 
+@NoDoc
 const class CsrfTokenGeneration {
 	private const |[Str:Obj?]|[] funcs
 
@@ -238,6 +254,7 @@ const class CsrfTokenGeneration {
 	}
 }
 
+@NoDoc
 const class CsrfTokenValidation {
 	private const |[Str:Obj?]|[] funcs
 
