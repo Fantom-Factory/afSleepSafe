@@ -135,21 +135,19 @@ internal class TestCsrfProtection : SleepSafeTest {
 	}
 
 	Void testCsrfSessionIdCheck() {
-		fireUp([CsrfTestModule#])
-		client.get(`/setSession`)
+		fireUp([CsrfTestModule#, CsrfCustomSessFuncMod#])
+		client.get(`/csrfSetSession`)
 		client.get(`/csrfHappy`)
 		res := Element("form").submitForm
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Post, nom=val1")
 
-		client.get(`/csrfBadSession`)
+		client.get(`/csrfBadSession`)	// like /csrfhappy, only it changes the sessId in the token
 		client.errOn4xx.enabled = false
 		res = Element("form").submitForm
 		verifyEq(res.statusCode, 403)
-		verifyEq(res.body.str, "403 - Suspected CSRF attack - Invalid '_csrfToken' value")
+		verifyEq(res.body.str, "403 - Suspected CSRF attack - Session ID mismatch")
 	}
-	
-	// session id texts
 }
 
 internal const class CsrfTestModule {
@@ -209,10 +207,15 @@ internal const class CsrfTestModule {
 
 		csrfSetSessionFn := |->Text| {
 			ses.id
-			tokenFn := (|->Str|) req.stash["afSleepSafe.csrfTokenFn"]
-			req.stash["afSleepSafe.csrfToken"] = tokenFn()
+			req.stash["afSleepSafe.csrfToken"] = ((|->Str|) req.stash["afSleepSafe.csrfTokenFn"])()
 			return Text.fromPlain("Okay")
 		}.toImmutable
+		
+		csrfBadSessionFn := |->Text| {
+			req.stash["newSessionId"] = true
+			req.stash["afSleepSafe.csrfToken"] = ((|->Str|) req.stash["afSleepSafe.csrfTokenFn"])()
+			return csrfHappy()			
+		}
 
 		config.add(Route(`/csrfHappy`, 				csrfHappy))
 		config.add(Route(`/csrfNoForm`,				Text.fromHtml("<!DOCTYPE html><html><body><form method='post' action='/post'></form></body></html>")))
@@ -227,6 +230,7 @@ internal const class CsrfTestModule {
 		config.add(Route(`/csrfUriHappy`,			csrfUriHappy))
 		config.add(Route(`/csrfUriUnhappy`,			csrfUriUnhappy))
 		config.add(Route(`/csrfSetSession`,			csrfSetSessionFn))
+		config.add(Route(`/csrfBadSession`,			csrfBadSessionFn))
 	}
 }
 
@@ -254,5 +258,17 @@ internal const class CsrfCustomGenFuncMod2 {
 		config["custom"] = |Str:Obj? hash| {
 			throw Err("Custom Boom!")
 		}
+	}
+}
+
+internal const class CsrfCustomSessFuncMod {
+	@Contribute { serviceType=CsrfTokenGeneration# }
+	private Void contributeCsrfTokenGeneration(Configuration config) {
+		scope := config.scope
+		config.set("custom", |Str:Obj? hash| {
+			req := (HttpRequest) scope.serviceByType(HttpRequest#)
+			if (req.stash["newSessionId"] == true)
+				hash["sId"] = 13
+		}).after("sessionId")
 	}
 }

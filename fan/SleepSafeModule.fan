@@ -40,13 +40,26 @@ const class SleepSafeModule {
 	}
 
 	@Contribute { serviceType=CsrfTokenValidation# }
-	Void contributeCsrfTokenValidation(Configuration config, ConfigSource configSrc) {
+	Void contributeCsrfTokenValidation(Configuration config, ConfigSource configSrc, HttpSession httpSession) {
 		config["timestamp"] = |Str:Obj? hash| {
 			timeout 	:= (Duration)  configSrc.get("afSleepSafe.csrfTokenTimeout", Duration#)
 			timestamp	:= Base64.fromB64(hash.get("ts", "0")) * 1ms.ticks
 			duration	:= Duration(DateTime.nowTicks - timestamp)
 			if (duration >= timeout)
 				throw Err("Token exceeds ${timeout} timeout: ${duration}")
+		}
+		config["sessionId"] = |Str:Obj? hash| {
+			if (hash.containsKey("sId")) {
+				if (!httpSession.exists)
+					// no session means a stale link
+					// we could throw an CSRF err, but more likely the app will want to redirect to a login page 
+					return
+				if (httpSession.id != hash["sId"])
+					throw Err("Session ID mismatch")
+			}
+			// if no sId but HTTP session exists...
+			// that's normal 'cos the session is normally created *after* the token is generated
+			// don't force the user to re-gen the csrf token - we're supposed to be invisible (almost!)
 		}
 	}
 
