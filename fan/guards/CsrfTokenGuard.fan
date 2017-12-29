@@ -94,7 +94,7 @@ using util::Random
 **   syntax: fantom 
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config) {
-**       config.remove("csrf")
+**       config.remove("csrfToken")
 **   }
 ** 
 ** To add custom data to the CSRF token hash:
@@ -119,7 +119,7 @@ using util::Random
 **  
 ** Any error thrown will be picked up by SafeSheet and converted to a '403 Forbidden' response.
 ** 
-const class CsrfGuard : Guard {
+const class CsrfTokenGuard : Guard {
 
 	// Docs for features not-implemented! If they're disabled by default, then they're not very useful. 
 	//

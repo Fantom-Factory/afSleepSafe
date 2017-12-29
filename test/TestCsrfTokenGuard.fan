@@ -5,10 +5,10 @@ using afBedSheet
 using concurrent::Actor
 using concurrent::AtomicRef
 
-internal class TestCsrfGuard : SleepSafeTest {
+internal class TestCsrfTokenGuard : SleepSafeTest {
 	
 	Void testCsrfHappy() {
-		fireUp([CsrfTestModule#])
+		fireUp([CsrfTokenTestModule#])
 		client.get(`/csrfHappy`)
 		FormInput("[name=nom]").verifyValueEq("val1")
 		res := Element("form").submitForm
@@ -18,7 +18,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfNoFormData() {
-		fireUp([CsrfTestModule#])
+		fireUp([CsrfTokenTestModule#])
 		client.get(`/csrfNoForm`)
 		client.errOn4xx.enabled = false
 		res := Element("form").submitForm
@@ -28,7 +28,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfNotFound() {
-		fireUp([CsrfTestModule#])
+		fireUp([CsrfTokenTestModule#])
 		client.get(`/csrfNotFound`)
 		client.errOn4xx.enabled = false
 		res := Element("form").submitForm
@@ -38,7 +38,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfInvalid() {
-		fireUp([CsrfTestModule#])
+		fireUp([CsrfTokenTestModule#])
 		client.get(`/csrfInvalid`)
 		client.errOn4xx.enabled = false
 		res := Element("form").submitForm
@@ -48,7 +48,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfTokenTimeout() {
-		fireUp([CsrfTestModule#], ["afSleepSafe.csrfTokenTimeout":"20ms"])
+		fireUp([CsrfTokenTestModule#], ["afSleepSafe.csrfTokenTimeout":"20ms"])
 		client.get(`/csrfHappy`)
 		client.errOn4xx.enabled = false
 		Actor.sleep(30ms)
@@ -59,7 +59,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfCustomTokenName() {
-		fireUp([CsrfTestModule#], ["afSleepSafe.csrfTokenName":"peanut"])
+		fireUp([CsrfTokenTestModule#], ["afSleepSafe.csrfTokenName":"peanut"])
 		client.get(`/csrfCustomName`)
 		res := Element("form").submitForm
 		verifyEq(res.statusCode, 200)
@@ -73,7 +73,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfCustomFuncs1() {
-		fireUp([CsrfTestModule#, CsrfCustomGenFuncMod1#])
+		fireUp([CsrfTokenTestModule#, CsrfCustomGenFuncMod1#])
 		client.get(`/csrfHappy`)
 		res := Element("form").submitForm
 		
@@ -83,7 +83,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfCustomFuncs2() {
-		fireUp([CsrfTestModule#, CsrfCustomGenFuncMod2#])
+		fireUp([CsrfTokenTestModule#, CsrfCustomGenFuncMod2#])
 		client.get(`/csrfHappy`)
 		client.errOn4xx.enabled = false
 		res := Element("form").submitForm
@@ -93,7 +93,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfPlainTextEnc() {
-		fireUp([CsrfTestModule#])
+		fireUp([CsrfTokenTestModule#])
 		client.get(`/csrfPlainHappy`)
 		res := Element("form").submitForm
 		verifyEq(res.statusCode, 200)
@@ -107,7 +107,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfMultipartEnc() {
-		fireUp([CsrfTestModule#])
+		fireUp([CsrfTokenTestModule#])
 		client.get(`/csrfMultipartHappy`)
 		res := Element("form").submitForm
 		verifyEq(res.statusCode, 200)
@@ -121,7 +121,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfQueryUri() {
-		fireUp([CsrfTestModule#])
+		fireUp([CsrfTokenTestModule#])
 		client.get(`/csrfUriHappy`)
 		res := Element("form").submitForm
 		verifyEq(res.statusCode, 200)
@@ -135,7 +135,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 
 	Void testCsrfSessionIdCheck() {
-		fireUp([CsrfTestModule#, CsrfCustomSessFuncMod#])
+		fireUp([CsrfTokenTestModule#, CsrfCustomSessFuncMod#])
 		client.get(`/csrfSetSession`)
 		client.get(`/csrfHappy`)
 		res := Element("form").submitForm
@@ -150,7 +150,7 @@ internal class TestCsrfGuard : SleepSafeTest {
 	}
 }
 
-internal const class CsrfTestModule {
+internal const class CsrfTokenTestModule {
 
 	@Contribute { serviceType=Routes# }
 	Void contributeRoutes(Configuration config) {

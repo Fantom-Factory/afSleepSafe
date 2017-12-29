@@ -25,7 +25,7 @@ const class SleepSafeModule {
 	@Contribute { serviceType=SleepSafeMiddleware# }
 	Void contributeSleepSafeMiddleware(Configuration config) {
 		config["xFrameOptions"]		= config.build(XFrameOptionsGuard#)
-		config["csrf"]				= config.build(CsrfGuard#)
+		config["csrfToken"]			= config.build(CsrfTokenGuard#)
 	}
 
 	@Contribute { serviceType=CsrfTokenGeneration# }
