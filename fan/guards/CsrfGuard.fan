@@ -117,6 +117,7 @@ using util::Random
 **     }
 ** }
 **  
+** Any error thrown will be picked up by SafeSheet and converted to a '403 Forbidden' response.
 ** 
 const class CsrfGuard : Guard {
 
