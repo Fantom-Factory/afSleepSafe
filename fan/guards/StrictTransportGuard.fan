@@ -19,7 +19,7 @@ using afBedSheet::HttpResponse
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config, IocEnv iocEnv) {
 **       if (iocEnv.isProd)
-**           config.add( StrictTransportGuard(5day) )
+**           config[StrictTransportGuard#] = StrictTransportGuard(5day)
 **   }
 ** 
 const class StrictTransportGuard : Guard {

@@ -26,6 +26,7 @@ const class SleepSafeModule {
 	Void contributeSleepSafeMiddleware(Configuration config) {
 		config[SameOriginGuard#]		= config.build(SameOriginGuard#)
 		config[CsrfTokenGuard#]			= config.build(CsrfTokenGuard#)
+		config[XContentTypeGuard#]		= config.build(XContentTypeGuard#)
 		config[XFrameOptionsGuard#]		= config.build(XFrameOptionsGuard#)
 		config[XXssProtectionGuard#]	= config.build(XXssProtectionGuard#)
 	}

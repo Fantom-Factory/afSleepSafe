@@ -31,13 +31,13 @@ internal class TestStrictTransportGuard : SleepSafeTest {
 internal const class StrictTransportMod1 {
 	@Contribute { serviceType=SleepSafeMiddleware# }
 	Void contributeSleepSafeMiddleware(Configuration config) {
-		config["strictTransport"] = StrictTransportGuard(1day)
+		config[StrictTransportGuard#] = StrictTransportGuard(1day)
 	}
 }
 
 internal const class StrictTransportMod2 {
 	@Contribute { serviceType=SleepSafeMiddleware# }
 	Void contributeSleepSafeMiddleware(Configuration config) {
-		config["strictTransport"] = StrictTransportGuard(365day * 2, true, true)
+		config[StrictTransportGuard#] = StrictTransportGuard(365day * 2, true, true)
 	}
 }
