@@ -4,7 +4,9 @@ using afBedSheet::HttpResponse
 
 ** Guards against clickjacking by setting an 'X-Frame-Options' HTTP response header that tells browsers not to embed the page in a frame.
 ** 
-** The 'X-Frame-Options' HTTP header is support by Internet Explorer 8, Firefox 3.6.9, Opera 10.50, Safari 4.0, Chrome 4.1.249.1042.
+**   X-Frame-Options: SAMEORIGIN
+** 
+** See [X-Frame-Options on MDN]`https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options` and [RFC 7034]`https://tools.ietf.org/html/rfc7034` for details.
 ** 
 ** 
 ** 
@@ -14,7 +16,7 @@ using afBedSheet::HttpResponse
 **   table:
 **   afIocConfig Key             Value
 **   --------------------------  ------------
-**   'afSleepSafe.xFrameOptions'  Defines who's allowed to embed the page in a frame. Set to 'deny' to forbid any embedding or 'sameorigin' to allow embedding from the same origin (default).
+**   'afSleepSafe.xFrameOptions'  Defines who's allowed to embed the page in a frame. Set to 'DENY' to forbid any embedding, 'SAMEORIGIN' to allow embedding from the same origin (default), or 'ALLOW-FROM https://example.com/' to specify a host.
 ** 
 ** Example:
 ** 
@@ -29,7 +31,7 @@ using afBedSheet::HttpResponse
 **   syntax: fantom 
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config) {
-**       config.remove(XFrameOptionsGuard)
+**       config.remove(XFrameOptionsGuard#)
 **   }
 ** 
 const class XFrameOptionsGuard : Guard {
