@@ -20,9 +20,9 @@ Class                   Guards Against                            Notes
 ----------------------  ----------------------------------------  ------------
 `ContentTypeGuard`      Content Sniffing                          Sets a 'X-Content-Type-Options' HTTP response header that tells browsers to trust the 'Content-Type' header
 `CsrfTokenGuard`        Cross Site Forgery Requests (CSRF)        Enforces an customisable Encrypted Token Pattern strategy
+`FrameOptionsGuard`     Clickjacking                              Sets an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame
 `SameOriginGuard`       Cross Site Forgery Requests (CSRF)        Checks the 'Referer' or 'Origin' HTTP header matches the 'Host'
 `StrictTransportGuard`  Protocol Downgrades and Cookie Hijacking  Sets a 'Strict-Transport-Security' HTTP header that tells browsers to use HTTPS
-`XFrameOptionsGuard`    Clickjacking                              Sets an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame
 `XXssProtectionGuard`   Cross Site Scripting (XSS)                Sets an 'X-XSS-Protection' HTTP header that tells browsers enable XSS filtering
 <pre
 
@@ -30,7 +30,7 @@ Class                   Guards Against                            Notes
  - `SameOriginGuard` - Guards against CSRF attacks by checking that the 'Referer' or 'Origin' HTTP header matches the 'Host'.
  - `StrictTransportGuard` - Guards against protocol downgrade attacks and Cookie hijacking by setting a 'Strict-Transport-Security' HTTP response header that tells browsers to use HTTPS.
  - `ContentTypeGuard` - Guards against dodgy Content-Type sniffing by setting a 'X-Content-Type-Options' HTTP response header that tells browsers to trust the 'Content-Type' header.
- - `XFrameOptionsGuard` - Guards against clickjacking by setting an 'X-Frame-Options' HTTP response header that tells browsers not to embed the page in a frame.
+ - `FrameOptionsGuard` - Guards against clickjacking by setting an 'X-Frame-Options' HTTP response header that tells browsers not to embed the page in a frame.
  - `XXssProtectionGuard` - Guards against Cross Site Scripting (XSS) by setting an 'X-XSS-Protection' HTTP response header that tells browsers enable XSS filtering.
 
 See the individual class documentation for more details.

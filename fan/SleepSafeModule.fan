@@ -27,7 +27,7 @@ const class SleepSafeModule {
 		config[SameOriginGuard#]		= config.build(SameOriginGuard#)
 		config[CsrfTokenGuard#]			= config.build(CsrfTokenGuard#)
 		config[ContentTypeGuard#]		= config.build(ContentTypeGuard#)
-		config[XFrameOptionsGuard#]		= config.build(XFrameOptionsGuard#)
+		config[FrameOptionsGuard#]		= config.build(FrameOptionsGuard#)
 		config[XXssProtectionGuard#]	= config.build(XXssProtectionGuard#)
 	}
 
@@ -77,8 +77,8 @@ const class SleepSafeModule {
 		
 		config["afSleepSafe.csrfTokenName"]			= "_csrfToken"
 		config["afSleepSafe.csrfTokenTimeout"]		= "60min"
+		config["afSleepSafe.frameOptions"]			= "SAMEORIGIN"
 		config["afSleepSafe.sameOriginWhitelist"]	= ""
-		config["afSleepSafe.xFrameOptions"]			= "SAMEORIGIN"
 		config["afSleepSafe.xXssProtectionEnable"]	= true
 		config["afSleepSafe.xXssProtectionMode"]	= "block"
 	}
