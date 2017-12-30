@@ -25,9 +25,7 @@ using afBedSheet::HttpResponse
 ** 
 const class StrictTransportGuard : Guard {
 
-	private const Duration	maxAge
-	private const Bool		includeSubdomains
-	private const Bool		preload
+	private const Str	hsts
 
 	** Creates a 'StrictTransportGuard' instance.
 	** 
@@ -35,18 +33,15 @@ const class StrictTransportGuard : Guard {
 	** - 'includeSubdomains' - If subdomains should also be HTTPS.
 	** - 'preload' - Allow this domain to be included in browsers HSTS preload list. See `https://hstspreload.org/` for details.
 	new make(Duration maxAge := 365day, Bool includeSubdomains := false, Bool preload := false) {
-		this.maxAge				= maxAge
-		this.includeSubdomains	= includeSubdomains
-		this.preload			= preload
-	}
-
-	@NoDoc
-	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		hsts := "max-age=${maxAge.toSec}"
+		hsts = "max-age=${maxAge.toSec}"
 		if (includeSubdomains)
 			hsts += "; includeSubDomains"
 		if (preload)
 			hsts += "; preload"
+	}
+
+	@NoDoc
+	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		httpRes.headers["Strict-Transport-Security"] = hsts
 		return null
 	}
