@@ -8,7 +8,7 @@ internal abstract class SleepSafeTest : Test {
 	BedServer? 	server
 	BedClient? 	client
 	
-	BedClient fireUp(Type[] mods := [,], [Str:Str?]? appConfig := null) {
+	BedClient fireUp(Type[] mods := [,], [Str:Obj?]? appConfig := null) {
 		Actor.locals["test.appConfig"] = appConfig
 		server = BedServer(SleepSafeModule#.pod)
 			.addModule(WebTestModule#)
@@ -49,7 +49,7 @@ internal const class WebTestModule {
 
 	@Contribute { serviceType=ApplicationDefaults# }
 	Void contributeApplicationDefaults(Configuration config) {
-		appConfig := ([Str:Str?]?) Actor.locals["test.appConfig"]
+		appConfig := ([Str:Obj?]?) Actor.locals["test.appConfig"]
 		appConfig?.each |v, k| { config[k] = v }
 	}
 

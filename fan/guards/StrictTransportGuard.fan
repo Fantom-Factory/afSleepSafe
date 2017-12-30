@@ -3,12 +3,11 @@ using afBedSheet::HttpResponse
 
 ** Guards against protocol downgrade attacks and Cookie hijacking by setting a 'Strict-Transport-Security' HTTP response header that tells browsers to use HTTPS. 
 ** 
-** The 'Strict-Transport-Security' HTTP header is support by all major browsers. 
-** See [HTTP Strict Transport Security (HSTS)]`https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security` and
-** [RFC 6797]`https://tools.ietf.org/html/rfc6797` for details. 
-** 
 **    Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 ** 
+** See [HTTP Strict Transport Security (HSTS)]`https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security` and
+** [RFC 6797]`https://tools.ietf.org/html/rfc6797` for details.
+**  
 ** 
 ** 
 ** IoC Configuration
@@ -20,7 +19,7 @@ using afBedSheet::HttpResponse
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config, IocEnv iocEnv) {
 **       if (iocEnv.isProd)
-**           config["strictTransport"] = StrictTransportGuard(5day)
+**           config.add( StrictTransportGuard(5day) )
 **   }
 ** 
 const class StrictTransportGuard : Guard {

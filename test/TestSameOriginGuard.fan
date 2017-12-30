@@ -62,7 +62,7 @@ internal class TestSameOriginGuard : SleepSafeTest {
 	}
 
 	Void testAltBedSheetHost() {
-		fireUp([NoCsrfTokenMod#, AltBedSheetHostTestMod#])
+		fireUp([NoCsrfTokenMod#], ["afBedSheet.host":"http://alt.example.com"])
 		res := client.sendRequest(ButterRequest(`/post`) {
 			it.method = "POST"
 			it.headers.origin = `http://alt.example.com/`
@@ -117,12 +117,12 @@ internal const class NoCsrfTokenMod {
 	}
 }
 
-internal const class AltBedSheetHostTestMod {
-	@Contribute { serviceType=ApplicationDefaults# }
-	Void contributeApplicationDefaults(Configuration config) {
-		config["afBedSheet.host"] = `http://alt.example.com`
-	}
-}
+//internal const class AltBedSheetHostTestMod {
+//	@Contribute { serviceType=ApplicationDefaults# }
+//	Void contributeApplicationDefaults(Configuration config) {
+//		config["afBedSheet.host"] = `http://alt.example.com`
+//	}
+//}
 
 internal const class OriginWhitelistTestMod {
 	@Contribute { serviceType=ApplicationDefaults# }

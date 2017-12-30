@@ -3,7 +3,7 @@ internal class TestXFrameOptionsGuard : SleepSafeTest {
 	
 	Void testDefaultConfig() {
 		res := fireUp.get(`/get`)
-		verifyEq(res.headers.xFrameOptions, "sameorigin")
+		verifyEq(res.headers.xFrameOptions, "SAMEORIGIN")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")
 	}
@@ -16,8 +16,8 @@ internal class TestXFrameOptionsGuard : SleepSafeTest {
 	}
 
 	Void testOtherConfig() {
-		res := fireUp([,], ["afSleepSafe.xFrameOptions":"deny"]).get(`/get`)
-		verifyEq(res.headers.xFrameOptions, "deny")
+		res := fireUp([,], ["afSleepSafe.xFrameOptions":"DENY"]).get(`/get`)
+		verifyEq(res.headers.xFrameOptions, "DENY")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")
 	}
