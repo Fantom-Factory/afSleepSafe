@@ -28,7 +28,7 @@ const class SleepSafeModule {
 		config[CsrfTokenGuard#]			= config.build(CsrfTokenGuard#)
 		config[ContentTypeGuard#]		= config.build(ContentTypeGuard#)
 		config[FrameOptionsGuard#]		= config.build(FrameOptionsGuard#)
-		config[XXssProtectionGuard#]	= config.build(XXssProtectionGuard#)
+		config[XssProtectionGuard#]		= config.build(XssProtectionGuard#)
 	}
 
 	@Contribute { serviceType=CsrfTokenGeneration# }
@@ -79,8 +79,8 @@ const class SleepSafeModule {
 		config["afSleepSafe.csrfTokenTimeout"]		= "60min"
 		config["afSleepSafe.frameOptions"]			= "SAMEORIGIN"
 		config["afSleepSafe.sameOriginWhitelist"]	= ""
-		config["afSleepSafe.xXssProtectionEnable"]	= true
-		config["afSleepSafe.xXssProtectionMode"]	= "block"
+		config["afSleepSafe.xssProtectionEnable"]	= true
+		config["afSleepSafe.xssProtectionMode"]		= "block"
 	}
 
 	@Contribute { serviceType=ActorPools# }

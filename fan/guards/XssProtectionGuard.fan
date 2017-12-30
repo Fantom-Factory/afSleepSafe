@@ -16,18 +16,18 @@ using afBedSheet::HttpResponse
 ** *****************
 ** 
 **   table:
-**   afIocConfig Key                     Value
-**   ----------------------------------  ------------
-**   'afSleepSafe.xXssProtectionEnable'  Tells the browser to enable / disable XSS filtering. Defaults to 'true'.
-**   'afSleepSafe.xXssProtectionMode'    How the browser should prevent the attack. Defaults to 'block'.
+**   afIocConfig Key                    Value
+**   ---------------------------------  ------------
+**   'afSleepSafe.xssProtectionEnable'  Tells the browser to enable / disable XSS filtering. Defaults to 'true'.
+**   'afSleepSafe.xssProtectionMode'    How the browser should prevent the attack. Defaults to 'block'.
 ** 
 ** Example:
 ** 
 **   syntax: fantom 
 **   @Contribute { serviceType=ApplicationDefaults# }
 **   Void contributeAppDefaults(Configuration config) {
-**       config["afSleepSafe.xXssProtectionEnable"] = false
-**       config["afSleepSafe.xXssProtectionMode"]   = null
+**       config["afSleepSafe.xssProtectionEnable"] = false
+**       config["afSleepSafe.xssProtectionMode"]   = null
 **   }
 ** 
 ** To disable, remove this class from the 'SleepSafeMiddleware' configuration:
@@ -35,25 +35,25 @@ using afBedSheet::HttpResponse
 **   syntax: fantom 
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config) {
-**       config.remove(XXssProtectionGuard#)
+**       config.remove(XssProtectionGuard#)
 **   }
 ** 
-const class XXssProtectionGuard : Guard {
+const class XssProtectionGuard : Guard {
 
-	@Config	private const Bool xXssProtectionEnable
-	@Config	private const Str? xXssProtectionMode
-			private const Str  xXssProtection
+	@Config	private const Bool xssProtectionEnable
+	@Config	private const Str? xssProtectionMode
+			private const Str  xssProtection
 
 	private new make(|This| f) {
 		f(this)
-		xXssProtection = xXssProtectionEnable ? "1" : "0"
-		if (xXssProtectionEnable && xXssProtectionMode != null)
-			xXssProtection += "; mode=${xXssProtectionMode}"
+		xssProtection = xssProtectionEnable ? "1" : "0"
+		if (xssProtectionEnable && xssProtectionMode != null)
+			xssProtection += "; mode=${xssProtectionMode}"
 	}
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		httpRes.headers.xXssProtection = xXssProtection
+		httpRes.headers.xXssProtection = xssProtection
 		return null
 	}
 }
