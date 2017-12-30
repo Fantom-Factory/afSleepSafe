@@ -18,7 +18,7 @@ using afBedSheet::HttpResponse
 **   table:
 **   afIocConfig Key                     Value
 **   ----------------------------------  ------------
-**   'afSleepSafe.xXssProtectionEnable'  Tells the browser to enable / disable XSS filtering. 
+**   'afSleepSafe.xXssProtectionEnable'  Tells the browser to enable / disable XSS filtering. Defaults to 'true'.
 **   'afSleepSafe.xXssProtectionMode'    How the browser should prevent the attack. Defaults to 'block'.
 ** 
 ** Example:
