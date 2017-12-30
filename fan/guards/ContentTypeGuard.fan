@@ -16,10 +16,10 @@ using afBedSheet::HttpResponse
 **   syntax: fantom 
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config) {
-**       config.remove(XContentTypeGuard#)
+**       config.remove(ContentTypeGuard#)
 **   }
 ** 
-const class XContentTypeGuard : Guard {
+const class ContentTypeGuard : Guard {
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {

@@ -1,5 +1,5 @@
 
-internal class TestXContentTypeGuard : SleepSafeTest {
+internal class TestContentTypeGuard : SleepSafeTest {
 
 	Void testDefaultConfig() {
 		res := fireUp.get(`/get`)
