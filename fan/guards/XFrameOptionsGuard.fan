@@ -29,7 +29,7 @@ using afBedSheet::HttpResponse
 **   syntax: fantom 
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config) {
-**       config.remove("xFrameOptions")
+**       config.remove(XFrameOptionsGuard)
 **   }
 ** 
 const class XFrameOptionsGuard : Guard {
