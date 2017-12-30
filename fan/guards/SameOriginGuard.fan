@@ -1,4 +1,5 @@
 using afIoc::Inject
+using afIocConfig::ConfigSource
 using afBedSheet::HttpRequest
 using afBedSheet::HttpResponse
 using afBedSheet::BedSheetServer
@@ -19,12 +20,25 @@ using afBedSheet::BedSheetServer
 ** Ioc Configuration
 ** *****************
 ** 
+**   table:
+**   afIocConfig Key                    Value
+**   ---------------------------------  ------------
+**   'afSleepSafe.sameOriginWhitelist'  A CSV of alternative allowed origins.
+** 
+** Example:
+** 
+**   syntax: fantom 
+**   @Contribute { serviceType=ApplicationDefaults# }
+**   Void contributeAppDefaults(Configuration config) {
+**       config["afSleepSafe.sameOriginWhitelist"] = "http://domain1.com, http://domain2.com"
+**   }
+ 
 ** To configure the BedSheet host:
 ** 
 **   syntax: fantom 
 **   @Contribute { serviceType=ApplicationDefaults# }
 **   Void contributeAppDefaults(Configuration config) {
-**       config["afSleepSafe.xFrameOptions"] = "deny"
+**       config["afBedSheet.host"] = `https://example.com`
 **   }
 ** 
 ** To disable CSRF referrer checking, remove this class from the 'SleepSafeMiddleware' configuration:
@@ -32,14 +46,19 @@ using afBedSheet::BedSheetServer
 **   syntax: fantom 
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config) {
-**       config.remove("csrfSameOrigin")
+**       config.remove(SameOriginGuard#)
 **   }
 ** 
-const class CsrfSameOriginGuard : Guard {
+const class SameOriginGuard : Guard {
 
-	@Inject	private const BedSheetServer bedServer
+	@Inject	private const BedSheetServer	bedServer
+			private const Uri[]				whitelist
 
-	private new make(|This| f) { f(this) }
+	private new make(ConfigSource configSrc, |This| f) {
+		f(this)
+		csv		 := (Str) configSrc.get("afSleepSafe.sameOriginWhitelist", Str#)
+		whitelist = csv.split(',').map { Uri(it, false) }.exclude { it == null || it.toStr.isEmpty }
+	}
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
@@ -47,20 +66,24 @@ const class CsrfSameOriginGuard : Guard {
 			host := bedServer.host
 
 			referrer := httpReq.headers.referrer?.plus(`/`)	// delete the path component
-			if (referrer != null && referrer.isAbs) {
-				if (host != referrer)
-					return "Suspected CSRF attack - Referrer does not match Host: ${referrer} != ${host}"
+			if (referrer != null) {
+				if (host != referrer && !whitelist.contains(referrer))
+					return csrfErr("Referrer does not match Host: ${referrer} != ${host}" + (whitelist.isEmpty ? "" : ", " + whitelist.join(", ")))
 			}
 			
 			origin := httpReq.headers.origin?.plus(`/`)	// delete any path component (not that there should be any)
-			if (origin != null && origin.isAbs) {
-				if (host != origin)
-					return "Suspected CSRF attack - Origin does not match Host: ${origin} != ${host}"
+			if (origin != null) {
+				if (host != origin && !whitelist.contains(origin))
+					return csrfErr("Origin does not match Host: ${origin} != ${host}" + (whitelist.isEmpty ? "" : ", " + whitelist.join(", ")))
 			}
-			
+
 			if (referrer == null && origin == null)
-				return "Suspected CSRF attack - HTTP request contains neither a Referrer nor an Origin header"
+				return csrfErr("HTTP request contains neither a Referrer nor an Origin header")
 		}
 		return null
+	}
+	
+	private Str csrfErr(Str msg) {
+		"Suspected CSRF attack - $msg"
 	}
 }

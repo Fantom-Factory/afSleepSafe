@@ -94,7 +94,7 @@ using util::Random
 **   syntax: fantom 
 **   @Contribute { serviceType=SleepSafeMiddleware# }
 **   Void contributeSleepSafeMiddleware(Configuration config) {
-**       config.remove("csrfToken")
+**       config.remove(CsrfTokenGuard#)
 **   }
 ** 
 ** To add custom data to the CSRF token hash:

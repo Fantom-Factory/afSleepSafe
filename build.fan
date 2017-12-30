@@ -27,7 +27,7 @@ class Build : BuildPod {
 			"afConcurrent 1.0.20 - 1.1",
 
 			// ---- Web -------------------------
-			"afBedSheet   1.5.8  - 1.5",
+			"afBedSheet   1.5.9  - 1.5",	// *****
 
 			// ---- Test ------------------------
 			"afBounce     1.1.6  - 1.1",
