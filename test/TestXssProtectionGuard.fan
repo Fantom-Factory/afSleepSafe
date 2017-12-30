@@ -1,5 +1,5 @@
 
-internal class TestXXssProtectionGuard : SleepSafeTest {
+internal class TestXssProtectionGuard : SleepSafeTest {
 
 	Void testDefaultConfig() {
 		res := fireUp.get(`/get`)
@@ -9,14 +9,14 @@ internal class TestXXssProtectionGuard : SleepSafeTest {
 	}
 
 	Void testDisableConfig() {
-		res := fireUp([,], ["afSleepSafe.xXssProtectionEnable":false]).get(`/get`)
+		res := fireUp([,], ["afSleepSafe.xssProtectionEnable":false]).get(`/get`)
 		verifyEq(res.headers.xXssProtection, "0")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")
 	}
 
 	Void testModeConfig() {
-		res := fireUp([,], ["afSleepSafe.xXssProtectionMode":null]).get(`/get`)
+		res := fireUp([,], ["afSleepSafe.xssProtectionMode":null]).get(`/get`)
 		verifyEq(res.headers.xXssProtection, "1")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")
