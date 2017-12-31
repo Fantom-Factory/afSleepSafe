@@ -24,6 +24,12 @@ using afBedSheet::HttpResponse
 ** SleepSafe also sets up a BedSheet Route ('report-uri') that browsers can report violations to. 
 ** The default implementation logs a pretty printed version of the report JSON.
 ** 
+** The default strategy is a good base to start with. You can then upgrade the directives as and when you need to. 
+** Although beware of inline scripts and style tags, as these will also be disabled. See []`https://hacks.mozilla.org/2016/02/implementing-content-security-policy/` for details. 
+** 
+** The reporting mechanism is good for development, but you may want to turn it off for production as browser add-ons can
+** cause violations, flooding your server. 
+** 
 ** 
 ** 
 ** Ioc Configuration

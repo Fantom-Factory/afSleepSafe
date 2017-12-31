@@ -33,6 +33,7 @@ const class SleepSafeModule {
 		config[CspGuard#]			= config.build(CspGuard#)
 		config[ContentTypeGuard#]	= config.build(ContentTypeGuard#)
 		config[FrameOptionsGuard#]	= config.build(FrameOptionsGuard#)
+		config[ReferrerPolicyGuard#]= config.build(ReferrerPolicyGuard#)
 		config[XssProtectionGuard#]	= config.build(XssProtectionGuard#)
 	}
 
@@ -97,6 +98,7 @@ const class SleepSafeModule {
 		config["afSleepSafe.csrfTokenName"]			= "_csrfToken"
 		config["afSleepSafe.csrfTokenTimeout"]		= "60min"
 		config["afSleepSafe.frameOptions"]			= "SAMEORIGIN"
+		config["afSleepSafe.referrerPolicy"]		= "no-referrer, strict-origin-when-cross-origin"
 		config["afSleepSafe.sameOriginWhitelist"]	= ""
 		config["afSleepSafe.sessionHijackEncrypt"]	= true
 		config["afSleepSafe.sessionHijackHeaders"]	= "User-Agent, Accept-Language"
