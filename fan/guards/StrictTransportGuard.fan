@@ -1,7 +1,8 @@
 using afBedSheet::HttpRequest
 using afBedSheet::HttpResponse
 
-** Guards against protocol downgrade attacks and Cookie hijacking by setting a 'Strict-Transport-Security' HTTP response header that tells browsers to use HTTPS. 
+** Guards against protocol downgrade attacks and Cookie hijacking by setting a 'Strict-Transport-Security' HTTP response 
+** header that tells browsers to use HTTPS. 
 ** 
 **    Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 ** 

@@ -1,7 +1,8 @@
 using afBedSheet::HttpRequest
 using afBedSheet::HttpResponse
 
-** Guards against dodgy Content-Type sniffing by setting a 'X-Content-Type-Options' HTTP response header that tells browsers to trust the 'Content-Type' header. 
+** Guards against dodgy Content-Type sniffing by setting a 'X-Content-Type-Options' HTTP response header that tells browsers 
+** to trust the 'Content-Type' header. 
 ** 
 **    X-Content-Type-Options: nosniff
 ** 

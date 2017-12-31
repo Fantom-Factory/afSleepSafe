@@ -18,6 +18,7 @@ pre>
 table:
 Class                   Guards Against                            Notes
 ----------------------  ----------------------------------------  ------------
+`CspGuard`              Cross Site Scripting (XSS)                Sets a 'Content-Security-Policy' HTTP response header that tells browsers to restrict where content can be loaded from.
 `ContentTypeGuard`      Content Sniffing                          Sets a 'X-Content-Type-Options' HTTP response header that tells browsers to trust the 'Content-Type' header
 `CsrfTokenGuard`        Cross Site Forgery Requests (CSRF)        Enforces an customisable Encrypted Token Pattern strategy
 `FrameOptionsGuard`     Clickjacking                              Sets an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame
@@ -27,6 +28,7 @@ Class                   Guards Against                            Notes
 `XssProtectionGuard`    Cross Site Scripting (XSS)                Sets an 'X-XSS-Protection' HTTP header that tells browsers enable XSS filtering
 <pre
 
+ - `CspGuard` - Guards against Cross Site Scripting (XSS) by setting an 'Content-Security-Policy' HTTP response header that tells browsers to restrict where content can be loaded from.
  - `CsrfTokenGuard` - Guards against CSRF attacks by enforcing an customisable Encrypted Token Pattern strategy.
  - `SameOriginGuard` - Guards against CSRF attacks by checking that the 'Referer' or 'Origin' HTTP header matches the 'Host'.
  - `SessionHijackGuard` - Guards against Session hijacking by caching browser user-agent parameters and checking them on each request.

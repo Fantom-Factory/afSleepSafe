@@ -18,7 +18,6 @@ class Build : BuildPod {
 		depends = [
 			"sys          1.0.70 - 1.0",
 			"concurrent   1.0.70 - 1.0",
-			"util         1.0.70 - 1.0",
 			
 			// ---- Core ------------------------
 			"afIoc        3.0.6  - 3.0",
@@ -32,12 +31,13 @@ class Build : BuildPod {
 			// ---- Test ------------------------
 			"afBounce     1.1.7  - 1.1",	// *****
 			"afButter     1.2.6  - 1.2",
+			"afConcurrent 1.0.20 - 1.0",
 		]
 
-		srcDirs = [`fan/`, `fan/guards/`, `fan/guards/wip/`, `fan/internal/`, `fan/public/`, `test/`]
+		srcDirs = [`fan/`, `fan/guards/`, `fan/internal/`, `fan/public/`, `test/`]
 		resDirs = [`doc/`]
 		
-		meta["afBuild.testPods"]	= "afBounce afButter"
+		meta["afBuild.testPods"]	= "afBounce afButter afConcurrent"
 		meta["afBuild.testDirs"]	= "test/"
 	}
 }

@@ -1,4 +1,3 @@
-using concurrent::AtomicInt
 
 ** (Service)
 internal const class Base64 {
@@ -31,8 +30,4 @@ internal const class Base64 {
 		}
 		return total
 	}	
-}
-
-class IdSequenceState {
-	Int nextId	:= 1
 }

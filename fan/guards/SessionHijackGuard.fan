@@ -73,6 +73,11 @@ const class SessionHijackGuard : Guard {
 		}
 
 		httpSes["afSleepSafe.sessionHash"] = hash
+		
+		// if the session is subsequently created in this request, then the user-agent params won't be cached until the next
+		// request! This gives a would be attacker a 1-request chance to sneak in right at the start. But given header values
+		// are easy to forge, any serious attack would easily bypass this Guard anyway.  
+		
 		return reject
 	}
 }

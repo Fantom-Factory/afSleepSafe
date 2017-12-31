@@ -2,7 +2,8 @@ using afIocConfig::Config
 using afBedSheet::HttpRequest
 using afBedSheet::HttpResponse
 
-** Guards against Cross Site Scripting (XSS) by setting an 'X-XSS-Protection' HTTP response header that tells browsers enable XSS filtering.
+** Guards against Cross Site Scripting (XSS) by setting an 'X-XSS-Protection' HTTP response header that tells browsers enable 
+** XSS filtering.
 ** 
 **   X-XSS-Protection: 1; mode=block
 ** 
