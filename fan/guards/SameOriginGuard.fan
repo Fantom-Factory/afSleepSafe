@@ -32,7 +32,7 @@ using afBedSheet::BedSheetServer
 **   Void contributeAppDefaults(Configuration config) {
 **       config["afSleepSafe.sameOriginWhitelist"] = "http://domain1.com, http://domain2.com"
 **   }
- 
+** 
 ** To configure the BedSheet host:
 ** 
 **   syntax: fantom 

@@ -93,7 +93,7 @@ const class SleepSafeModule {
 
 	@Contribute { serviceType=FactoryDefaults# }
 	Void contributeFactoryDefaults(Configuration config) {
-		config["afSleepSafe.deniedStatusCode"]		= "403"
+		config["afSleepSafe.rejectedStatusCode"]	= "403"
 		
 		config["afSleepSafe.csrfTokenName"]			= "_csrfToken"
 		config["afSleepSafe.csrfTokenTimeout"]		= "60min"

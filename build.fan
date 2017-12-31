@@ -10,7 +10,7 @@ class Build : BuildPod {
 
 		meta = [
 			"pod.dis"		: "Sleep Safe",
-			"repo.tags"		: "web",
+			"repo.tags"		: "web security",
 			"repo.public"	: "true",
 			"afIoc.module"	: "afSleepSafe::SleepSafeModule"
 		]

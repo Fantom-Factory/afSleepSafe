@@ -98,39 +98,27 @@ using afBedSheet
 ** 
 ** To add custom data to the CSRF token hash:
 ** 
-** @Contribute { serviceType=CsrfTokenGeneration# }
-** private Void contributeCsrfTokenGeneration(Configuration config) {
-**     config["user"] = |Str:Obj? hash| {
-**         hash["user"] = "Princess Daisy"
-**     }
-** }
+**   @Contribute { serviceType=CsrfTokenGeneration# }
+**   private Void contributeCsrfTokenGeneration(Configuration config) {
+**       config["user"] = |Str:Obj? hash| {
+**           hash["user"] = "Princess Daisy"
+**       }
+**   }
 ** 
 ** Then to verify the custom data in the token hash:
 ** 
-** @Contribute { serviceType=CsrfTokenValidation# }
-** private Void contributeCsrfTokenValidation(Configuration config) {
-**     config["user"] = |Str:Obj? hash| {
-**         if (hash.containsKey["user"])
-**             if (hash["user"] != "Princess Daisy")
-**                 throw Err("User is not a Princess!")
-**     }
-** }
+**   @Contribute { serviceType=CsrfTokenValidation# }
+**   private Void contributeCsrfTokenValidation(Configuration config) {
+**       config["user"] = |Str:Obj? hash| {
+**           if (hash.containsKey["user"])
+**               if (hash["user"] != "Princess Daisy")
+**                   throw Err("User is not a Princess!")
+**       }
+**   }
 **  
 ** Any error thrown will be picked up by SafeSheet and converted to a '403 Forbidden' response.
 ** 
 const class CsrfTokenGuard : Guard {
-
-	// Docs for features not-implemented! If they're disabled by default, then they're not very useful. 
-	//
-	// Custom HTTP Request Headers
-	// ===========================
-	// SleepSafe can optionally skip token checks if the request contains a named custom header, such as 'X-Requested-With: XMLHttpRequest'.
-	// 
-	// That's because custom headers can only be set via [XMLHttpRequest]`https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/setRequestHeader`
-	// and 'XMLHttpRequests' are subject to the [Same Origin Policy]`https://en.wikipedia.org/wiki/XMLHttpRequest#Cross-domain_requests`.
-	// Hence it is impossible for an attacker to submit custom headers in a CSRF attack.
-	// 
-	// This is disabled by default as *not* checking the CSRF token could leave you vulnerable to other non-CSRF attacks.
 
 	@Inject	private const CsrfCrypto			crypto
 	@Inject	private const CsrfTokenGeneration	genFuncs
