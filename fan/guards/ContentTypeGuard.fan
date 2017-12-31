@@ -23,6 +23,9 @@ using afBedSheet::HttpResponse
 const class ContentTypeGuard : Guard {
 
 	@NoDoc
+	override const Str protectsAgainst	:= "Content-Type Sniffing" 
+	
+	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		httpRes.headers.xContentTypeOptions = "nosniff"
 		return null

@@ -61,6 +61,9 @@ const class SameOriginGuard : Guard {
 	}
 
 	@NoDoc
+	override const Str protectsAgainst	:= "CSRF" 
+
+	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		if (CsrfTokenGuard.fromVunerableUrl(httpReq)) {
 			host := bedServer.host

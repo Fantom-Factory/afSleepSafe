@@ -42,6 +42,9 @@ const class FrameOptionsGuard : Guard {
 	private new make(|This| f) { f(this) }
 	
 	@NoDoc
+	override const Str protectsAgainst	:= "Clickjacking" 
+
+	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		httpRes.headers.xFrameOptions = frameOptions
 		return null

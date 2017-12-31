@@ -16,9 +16,15 @@ const class SleepSafeModule {
 
 	Void onRegistryStartup(Configuration config) {
 		scope := config.scope
-		config["csrfKeyGen"] = |->| {
+		config["afSleepSafe.csrfKeyGen"] = |->| {
 			crypto := (CsrfCrypto) scope.serviceById(CsrfCrypto#.qname)
 			crypto.generateKey
+		}
+		config["afSleepSafe.logGuards"] = |->| {
+			middleware := (SleepSafeMiddleware) scope.serviceById(SleepSafeMiddleware#.qname)
+			msg := "SleepSafe knowing your application is protected against: "
+			msg += middleware.guards.rw.sort.join(", ") { it.protectsAgainst }
+			typeof.pod.log.info(msg)
 		}
 	}
 
