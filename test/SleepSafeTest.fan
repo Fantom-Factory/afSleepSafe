@@ -61,9 +61,4 @@ internal const class WebTestModule {
 	Void onRegistryShutdown(Configuration config) {
 		config.remove("afIoc.sayGoodbye", "afIoc.silentBoodbye")
 	}
-
-//	@Override
-//	IocEnv overrideIocEnv() {
-//        IocEnv.fromStr("Testing")
-//    }
 }

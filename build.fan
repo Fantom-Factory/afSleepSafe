@@ -30,7 +30,7 @@ class Build : BuildPod {
 			"afBedSheet   1.5.9  - 1.5",	// *****
 
 			// ---- Test ------------------------
-			"afBounce     1.1.6  - 1.1",
+			"afBounce     1.1.7  - 1.1",	// *****
 			"afButter     1.2.6  - 1.2",
 		]
 

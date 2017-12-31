@@ -25,6 +25,7 @@ const class SleepSafeModule {
 	@Contribute { serviceType=SleepSafeMiddleware# }
 	Void contributeSleepSafeMiddleware(Configuration config) {
 		config[SameOriginGuard#]		= config.build(SameOriginGuard#)
+		config[SessionHijackGuard#]		= config.build(SessionHijackGuard#)
 		config[CsrfTokenGuard#]			= config.build(CsrfTokenGuard#)
 		config[ContentTypeGuard#]		= config.build(ContentTypeGuard#)
 		config[FrameOptionsGuard#]		= config.build(FrameOptionsGuard#)
@@ -79,6 +80,8 @@ const class SleepSafeModule {
 		config["afSleepSafe.csrfTokenTimeout"]		= "60min"
 		config["afSleepSafe.frameOptions"]			= "SAMEORIGIN"
 		config["afSleepSafe.sameOriginWhitelist"]	= ""
+		config["afSleepSafe.sessionHijackEncrypt"]	= true
+		config["afSleepSafe.sessionHijackHeaders"]	= "User-Agent, Accept-Language"
 		config["afSleepSafe.xssProtectionEnable"]	= true
 		config["afSleepSafe.xssProtectionMode"]		= "block"
 	}

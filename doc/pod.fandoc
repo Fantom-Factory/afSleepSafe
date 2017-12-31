@@ -22,12 +22,14 @@ Class                   Guards Against                            Notes
 `CsrfTokenGuard`        Cross Site Forgery Requests (CSRF)        Enforces an customisable Encrypted Token Pattern strategy
 `FrameOptionsGuard`     Clickjacking                              Sets an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame
 `SameOriginGuard`       Cross Site Forgery Requests (CSRF)        Checks the 'Referer' or 'Origin' HTTP header matches the 'Host'
+`SessionHijackGuard`    Session Hijacking                         Caches browser user-agent parameters and checks them on each request, dropping the session if they change.
 `StrictTransportGuard`  Protocol Downgrades and Cookie Hijacking  Sets a 'Strict-Transport-Security' HTTP header that tells browsers to use HTTPS
 `XssProtectionGuard`    Cross Site Scripting (XSS)                Sets an 'X-XSS-Protection' HTTP header that tells browsers enable XSS filtering
 <pre
 
  - `CsrfTokenGuard` - Guards against CSRF attacks by enforcing an customisable Encrypted Token Pattern strategy.
  - `SameOriginGuard` - Guards against CSRF attacks by checking that the 'Referer' or 'Origin' HTTP header matches the 'Host'.
+ - `SessionHijackGuard` - Guards against Session hijacking by caching browser user-agent parameters and checking them on each request.
  - `StrictTransportGuard` - Guards against protocol downgrade attacks and Cookie hijacking by setting a 'Strict-Transport-Security' HTTP response header that tells browsers to use HTTPS.
  - `ContentTypeGuard` - Guards against dodgy Content-Type sniffing by setting a 'X-Content-Type-Options' HTTP response header that tells browsers to trust the 'Content-Type' header.
  - `FrameOptionsGuard` - Guards against clickjacking by setting an 'X-Frame-Options' HTTP response header that tells browsers not to embed the page in a frame.

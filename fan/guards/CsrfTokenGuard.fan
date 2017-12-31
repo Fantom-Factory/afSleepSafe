@@ -76,7 +76,7 @@ using util::Random
 ** 
 **   table:
 **   afIocConfig Key                 Value
-**   ---------------------------     ------------
+**   ------------------------------  ------------
 **   'afSleepSafe.csrfTokenName'     Name of the posted form field that holds the CSRF token. Defaults to '_csrfToken'.
 **   'afSleepSafe.csrfTokenTimeout'  How long CSRF tokens have to live. Set to 'null' to disable timeouts. Defaults to '60min'.
 ** 
@@ -123,20 +123,6 @@ const class CsrfTokenGuard : Guard {
 
 	// Docs for features not-implemented! If they're disabled by default, then they're not very useful. 
 	//
-	// Origin HTTP Request Header
-	// ==========================
-	// SleepSafe can optionally skip token checks if the request contains an 'Origin' header that matches the BedSheet configured host. 
-	// 'Origin' is a browser controller request header that can be trusted within the context of CSRF attacks. 
-	// If the 'Origin' header matches the BedSheet host, then the request was initiated by content from this server and the request
-	// can be trusted.
-	// 
-	// Note that the default BedSheet host of 'localhost' is not trusted and requests with such 'Origin' values are still subject
-	// to CSRF token checks.    
-	// 
-	// This is disabled by default as *not* checking the CSRF token could leave you vulnerable to other non-CSRF attacks.
-	//
-	//  
-	// 
 	// Custom HTTP Request Headers
 	// ===========================
 	// SleepSafe can optionally skip token checks if the request contains a named custom header, such as 'X-Requested-With: XMLHttpRequest'.
@@ -147,9 +133,6 @@ const class CsrfTokenGuard : Guard {
 	// 
 	// This is disabled by default as *not* checking the CSRF token could leave you vulnerable to other non-CSRF attacks.
 
-	@Inject	private const HttpRequest			httpReq
-	@Inject	private const HttpResponse			httpRes
-	@Inject	private const HttpSession			httpSes
 	@Inject	private const CsrfCrypto			crypto
 	@Inject	private const CsrfTokenGeneration	genFuncs
 	@Inject	private const CsrfTokenValidation	valFuncs
@@ -164,13 +147,13 @@ const class CsrfTokenGuard : Guard {
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		httpReq.stash["afSleepSafe.csrfToken"]		= generateToken
+		httpReq.stash["afSleepSafe.csrfToken"]		= generateToken()
 		httpReq.stash["afSleepSafe.csrfTokenFn"]	= #generateToken.func.bind([this])		
 
-		return fromVunerableUrl(httpReq) ? doProtection : null
+		return fromVunerableUrl(httpReq) ? doProtection(httpReq, httpRes) : null
 	}
 
-	private Str? doProtection() {
+	private Str? doProtection(HttpRequest httpReq, HttpResponse httpRes) {
 		csrfToken := null as Str
 
 		if (httpReq.url.query.containsKey(tokenName)) {
