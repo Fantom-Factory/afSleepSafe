@@ -24,7 +24,7 @@ const class ContentTypeGuard : Guard {
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		httpRes.headers["X-Content-Type-Options"] = "nosniff"
+		httpRes.headers.xContentTypeOptions = "nosniff"
 		return null
 	}
 }

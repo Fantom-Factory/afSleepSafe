@@ -3,7 +3,7 @@ internal class TestReferrerPolicyGuard : SleepSafeTest {
 	
 	Void testDefaultConfig() {
 		res := fireUp.get(`/get`)
-		verifyEq(res.headers["Referrer-Policy"], "no-referrer, strict-origin-when-cross-origin")
+		verifyEq(res.headers.referrerPolicy, "no-referrer, strict-origin-when-cross-origin")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")
 	}
@@ -17,7 +17,7 @@ internal class TestReferrerPolicyGuard : SleepSafeTest {
 
 	Void testOtherConfig() {
 		res := fireUp([,], ["afSleepSafe.referrerPolicy":"same-origin"]).get(`/get`)
-		verifyEq(res.headers["Referrer-Policy"], "same-origin")
+		verifyEq(res.headers.referrerPolicy, "same-origin")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")
 	}

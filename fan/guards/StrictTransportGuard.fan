@@ -42,7 +42,7 @@ const class StrictTransportGuard : Guard {
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		httpRes.headers["Strict-Transport-Security"] = hsts
+		httpRes.headers.strictTransportSecurity = hsts
 		return null
 	}
 }
