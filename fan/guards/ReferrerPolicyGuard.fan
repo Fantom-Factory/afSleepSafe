@@ -44,7 +44,7 @@ const class ReferrerPolicyGuard : Guard {
 	
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		httpRes.headers["Referrer-Policy"] = referrerPolicy
+		httpRes.headers.referrerPolicy = referrerPolicy
 		return null
 	}
 }

@@ -91,4 +91,14 @@ internal class TestCspGuard : SleepSafeTest {
 		verifyEq(logs.size, 1)
 		verifyEq(logs.first, "[big:balloons]")
 	}
+
+	Void testReportOnly() {
+		logs		:= AtomicList()
+		res := fireUp([,], [
+			"afSleepSafe.cspReportOnly"	: true,
+		]).get(`/get`)
+
+		verifyNull(res.headers.contentSecurityPolicy)
+		verifyNotNull(res.headers.contentSecurityPolicyReportOnly)
+	}
 }
