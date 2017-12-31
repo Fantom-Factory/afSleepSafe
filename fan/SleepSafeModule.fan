@@ -24,12 +24,16 @@ const class SleepSafeModule {
 
 	@Contribute { serviceType=SleepSafeMiddleware# }
 	Void contributeSleepSafeMiddleware(Configuration config) {
-		config[SameOriginGuard#]		= config.build(SameOriginGuard#)
-		config[SessionHijackGuard#]		= config.build(SessionHijackGuard#)
-		config[CsrfTokenGuard#]			= config.build(CsrfTokenGuard#)
-		config[ContentTypeGuard#]		= config.build(ContentTypeGuard#)
-		config[FrameOptionsGuard#]		= config.build(FrameOptionsGuard#)
-		config[XssProtectionGuard#]		= config.build(XssProtectionGuard#)
+		// request checkers
+		config[SameOriginGuard#]	= config.build(SameOriginGuard#)
+		config[SessionHijackGuard#]	= config.build(SessionHijackGuard#)
+		config[CsrfTokenGuard#]		= config.build(CsrfTokenGuard#)
+		
+		// header setters
+		config[CspGuard#]			= config.build(CspGuard#)
+		config[ContentTypeGuard#]	= config.build(ContentTypeGuard#)
+		config[FrameOptionsGuard#]	= config.build(FrameOptionsGuard#)
+		config[XssProtectionGuard#]	= config.build(XssProtectionGuard#)
 	}
 
 	@Contribute { serviceType=CsrfTokenGeneration# }
@@ -67,13 +71,27 @@ const class SleepSafeModule {
 		}
 	}
 
+	@Contribute { serviceType=Routes# }
+	Void contributeRoutes(Configuration config, ConfigSource configSrc, HttpRequest httpReq) {
+		reportUri := (Uri?             ) configSrc.get("afSleepSafe.csp.report-uri", Uri#, false)
+		reportFn  := (|Str:Obj?->Obj?|?) configSrc.get("afSleepSafe.cspReportFn", null, false)
+		if (reportUri != null && reportFn != null) {
+			routeFn	:=  |->Obj?| {
+				json := httpReq.body.jsonMap
+				return reportFn(json) ?: Text.fromPlain("OK")
+			}.toImmutable
+			
+			config.add(Route(reportUri,	routeFn, "POST"))
+		}
+	}
+	
 	@Contribute { serviceType=MiddlewarePipeline# }
 	Void contributeMiddleware(Configuration config, SleepSafeMiddleware middleware) {
 		config.set("SleepSafeMiddleware", middleware).before("afBedSheet.routes")
 	}
 
 	@Contribute { serviceType=FactoryDefaults# }
-	private Void contributeFactoryDefaults(Configuration config) {
+	Void contributeFactoryDefaults(Configuration config) {
 		config["afSleepSafe.deniedStatusCode"]		= "403"
 		
 		config["afSleepSafe.csrfTokenName"]			= "_csrfToken"
@@ -84,10 +102,22 @@ const class SleepSafeModule {
 		config["afSleepSafe.sessionHijackHeaders"]	= "User-Agent, Accept-Language"
 		config["afSleepSafe.xssProtectionEnable"]	= true
 		config["afSleepSafe.xssProtectionMode"]		= "block"
+
+		config["afSleepSafe.csp.default-src"]		= "'self'"
+		config["afSleepSafe.csp.object-src"]		= "'none'"
+		config["afSleepSafe.csp.base-uri"]			= "'self'"
+		config["afSleepSafe.csp.form-action"]		= "'self'"
+		config["afSleepSafe.csp.frame-ancestors"]	= "'self'"
+		config["afSleepSafe.csp.report-uri"]		= "/_sleepSafeCspViolation"
+		config["afSleepSafe.cspReportOnly"]			= false
+		config["afSleepSafe.cspReportFn"]			= |Str:Obj? report| {
+			txt := JsonWriter(true).writeJson(report)
+			typeof.pod.log.warn("Content-Security-Policy Violation:\n${txt}")
+		}
 	}
 
 	@Contribute { serviceType=ActorPools# }
-	private Void contributeActorPools(Configuration config) {
+	Void contributeActorPools(Configuration config) {
 		config["csrfKeyGen"] = ActorPool() { it.name = "CSRF Key Gen" }
 	}
 }
