@@ -53,6 +53,9 @@ const class XssProtectionGuard : Guard {
 	}
 
 	@NoDoc
+	override const Str protectsAgainst	:= "XSS"
+
+	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		httpRes.headers.xXssProtection = xssProtection
 		return null

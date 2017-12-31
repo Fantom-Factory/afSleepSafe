@@ -133,6 +133,9 @@ const class CsrfTokenGuard : Guard {
 	private new make(|This| f) { f(this) }
 
 	@NoDoc
+	override const Str protectsAgainst	:= "CSRF" 
+
+	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		httpReq.stash["afSleepSafe.csrfToken"]		= generateToken()
 		httpReq.stash["afSleepSafe.csrfTokenFn"]	= #generateToken.func.bind([this])		

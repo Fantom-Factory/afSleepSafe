@@ -73,6 +73,9 @@ const class CspGuard : Guard {
 	** The 'Content-Security-Protection' directives that get passed to the browser
 	const Str:Str directives
 	
+	@NoDoc
+	override const Str protectsAgainst	:= "XSS" 
+
 	private new make(ConfigSource configSrc, |This| f) {
 		f(this)
 		

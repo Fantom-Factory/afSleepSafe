@@ -41,7 +41,10 @@ const class ReferrerPolicyGuard : Guard {
 	@Config	private const Str? referrerPolicy
 	
 	private new make(|This| f) { f(this) }
-	
+
+	@NoDoc
+	override const Str protectsAgainst	:= "Internal URL Leakage" 
+
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		httpRes.headers.referrerPolicy = referrerPolicy

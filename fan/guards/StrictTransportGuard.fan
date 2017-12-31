@@ -39,6 +39,9 @@ const class StrictTransportGuard : Guard {
 		if (preload)
 			hsts += "; preload"
 	}
+	
+	@NoDoc
+	override const Str protectsAgainst	:= "Cookie Hijacking" 
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {

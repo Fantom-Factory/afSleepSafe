@@ -50,6 +50,9 @@ const class SessionHijackGuard : Guard {
 	}
 	
 	@NoDoc
+	override const Str protectsAgainst	:= "Session Hijacking" 
+
+	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		if (!httpSes.exists)
 			return null

@@ -12,6 +12,11 @@ using afBedSheet::HttpResponse
 **   }
 ** 
 const mixin Guard {
+
+	** Return what this Guard protects against. Used in startup logging.
+//	virtual 
+	abstract Str protectsAgainst()
+	//{ "" }
 	
 	** Called at the start of HTTP request. Return an error message to reject the request.  
 	abstract Str? guard(HttpRequest req, HttpResponse res)
