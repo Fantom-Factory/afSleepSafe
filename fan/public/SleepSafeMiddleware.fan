@@ -9,13 +9,15 @@ const class SleepSafeMiddleware : Middleware {
 	@Inject private const HttpRequest			req
 	@Inject private const HttpResponse			res
 	@Inject private const ResponseProcessors	resPros
-	@Config	private const Int					deniedStatusCode
+	@Config	private const Int					rejectedStatusCode
 			private const Guard[]				guards
 	
 	private new make(Type:Guard guards, |This| f) {
 		// note: we can inject just "Guard[]" when we upgrade to afIoc 3.0.8  
 		this.guards = guards.vals
 		f(this)
+		
+		// FIXME pretty logging or no logging!?
 		
 		msg := "\n\n"
 		msg += "SleepSafe is protecting your web application against:\n"
@@ -28,15 +30,15 @@ const class SleepSafeMiddleware : Middleware {
 		denied := guards.eachWhile { it.guard(req, res) }
 		
 		if (denied != null)
-			respondToSuspectedAttack(denied)
+			rejectSuspectedAttack(denied)
 		else
 			pipeline.service
 	}
 	
 	** Hook to respond to failed Guard checks. 
 	** Defaults to logging the msg (at warn level) and processes a 403 status.
-	virtual Void respondToSuspectedAttack(Str msg) {
+	virtual Void rejectSuspectedAttack(Str msg) {
 		log.warn(msg)
-		resPros.processResponse(HttpStatus(deniedStatusCode, msg))
+		resPros.processResponse(HttpStatus(rejectedStatusCode, msg))
 	}
 }

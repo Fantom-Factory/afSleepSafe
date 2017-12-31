@@ -2,9 +2,12 @@ Overview
 ********
 Guards your BedSheet web app against CSFR, XSS, and other attacks, letting you Sleep Safe at night!
 
-For the most part, Sleep Safe is completely unobtrusive. Simply reference 'afSleepSafe' as a dependecny in your project's 'build.fan' and let the sensible defaults monitor your HTTP requests and set HTTP response headers.
+For the most part, Sleep Safe is completely unobtrusive. Simply reference 'afSleepSafe' as a dependecny in your project's 'build.fan' and let the sensible defaults monitor your HTTP requests and set protective HTTP response headers.
 
-Sleep Safe was inspired by Ruby's [Rack Protection]`https://github.com/sinatra/sinatra/tree/master/rack-protection` library.
+Note that other Alien-Factory libraries integrate seemlessly with Sleep Safe:
+
+ - [Duvet]`pod:afDuvet` - When injecting scripts and stylesheets, Duvet will automatically adjust the Content-Security-Policy to include a hash of the added content.
+ - [FormBean]`pod:afFormBean` - When rendering forms, FormBean will automatically render any CSRF token as hidden inputs.
 
 
 
@@ -29,15 +32,31 @@ Class                   Guards Against                            Notes
 `XssProtectionGuard`    Cross Site Scripting (XSS)                Sets an 'X-XSS-Protection' HTTP header that tells browsers enable XSS filtering
 <pre
 
- - `CspGuard` - Guards against Cross Site Scripting (XSS) by setting an 'Content-Security-Policy' HTTP response header that tells browsers to restrict where content can be loaded from.
- - `CsrfTokenGuard` - Guards against CSRF attacks by enforcing an customisable Encrypted Token Pattern strategy.
- - `FrameOptionsGuard` - Guards against clickjacking by setting an 'X-Frame-Options' HTTP response header that tells browsers not to embed the page in a frame.
- - `ReferrerPolicyGuard` - Guards against internal URL leakage by setting a 'Referrer-Policy' HTTP response header that tells browsers how and when to transmit the HTTP Referer (sic) header.
- - `SameOriginGuard` - Guards against CSRF attacks by checking that the 'Referer' or 'Origin' HTTP header matches the 'Host'.
- - `SessionHijackGuard` - Guards against Session hijacking by caching browser user-agent parameters and checking them on each request.
- - `StrictTransportGuard` - Guards against protocol downgrade attacks and Cookie hijacking by setting a 'Strict-Transport-Security' HTTP response header that tells browsers to use HTTPS.
- - `ContentTypeGuard` - Guards against dodgy Content-Type sniffing by setting a 'X-Content-Type-Options' HTTP response header that tells browsers to trust the 'Content-Type' header.
- - `XssProtectionGuard` - Guards against Cross Site Scripting (XSS) by setting an 'X-XSS-Protection' HTTP response header that tells browsers enable XSS filtering.
-
 See the individual class documentation for more details.
+
+
+
+IoC Configuration
+*****************
+When a Guard rejects a HTTP request, it processes a standard BedSheet 'HttpStatus' object with a '403 - Forbidden' status code. This is then handled by BedSheet in the usual manner, for you to override - see [HTTP Status Processing]`http://eggbox.fantomfactory.org/pods/afBedSheet/doc/#httpStatusProcessing`.
+
+Use IoC Config to change the status code:
+
+pre>
+syntax: fantom
+@Contribute { serviceType=ApplicationDefaults# }
+Void contributeAppDefaults(Configuration config) {
+    config["afSleepSafe.rejectedStatusCode"] = 400
+}
+<pre
+
+or as `SleepSafeMiddleware` is a service, you can override it and the 'rejectSuspectedAttack()' method.
+
+
+
+References
+**********
+Use `https://observatory.mozilla.org/` to probe your site's HTTP response headers and give information on how best to configure them.
+
+Sleep Safe was inspired by Ruby's [Rack Protection]`https://github.com/sinatra/sinatra/tree/master/rack-protection` library.
 
