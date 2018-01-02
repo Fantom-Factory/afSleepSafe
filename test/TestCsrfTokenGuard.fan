@@ -161,19 +161,19 @@ internal const class CsrfTokenTestModule {
 		csrfHtml := "<!DOCTYPE html><html><body><form method='post' enctype='application/x-www-form-urlencoded' action='/post'><input name='nom' value='val1'><input type='hidden' name='_csrfToken' value='%{csrfToken}'></form></body></html>"
 
 		csrfHappy := |->Text| {
-			tok := (Str) req.stash["afSleepSafe.csrfToken"]
+			tok := (Str) req.stash["afSleepSafe.csrfTokenFn"]->call
 			str := csrfHtml.replace("%{csrfToken}", tok)
 			return Text.fromHtml(str)
 		}.toImmutable
 
 		csrfCustomName := |->Text| {
-			tok := (Str) req.stash["afSleepSafe.csrfToken"]
+			tok := (Str) req.stash["afSleepSafe.csrfTokenFn"]->call
 			str := csrfHtml.replace("%{csrfToken}", tok).replace("_csrfToken", "peanut").replace("val1", "val3")
 			return Text.fromHtml(str)
 		}.toImmutable
 
 		csrfPlainTextHappy := |->Text| {
-			tok := (Str) req.stash["afSleepSafe.csrfToken"]
+			tok := (Str) req.stash["afSleepSafe.csrfTokenFn"]->call
 			str := csrfHtml.replace("%{csrfToken}", tok).replace("val1", "val5").replace("application/x-www-form-urlencoded", "text/plain")
 			return Text.fromHtml(str)
 		}.toImmutable
@@ -184,7 +184,7 @@ internal const class CsrfTokenTestModule {
 		}.toImmutable
 
 		csrfMultipartHappy := |->Text| {
-			tok := (Str) req.stash["afSleepSafe.csrfToken"]
+			tok := (Str) req.stash["afSleepSafe.csrfTokenFn"]->call
 			str := csrfHtml.replace("%{csrfToken}", tok).replace("val1", "val6").replace("application/x-www-form-urlencoded", "multipart/form-data").replace("/post", "/post2")
 			return Text.fromHtml(str)
 		}.toImmutable
@@ -195,7 +195,7 @@ internal const class CsrfTokenTestModule {
 		}.toImmutable
 
 		csrfUriHappy := |->Text| {
-			tok := (Str) req.stash["afSleepSafe.csrfToken"]
+			tok := (Str) req.stash["afSleepSafe.csrfTokenFn"]->call
 			str := csrfHtml.replace("_csrfToken", "meh").replace("/post", "/post?_csrfToken=$tok").replace("application/x-www-form-urlencoded", "multipart/form-data").replace("/post", "/post2").replace("val1", "val6")
 			return Text.fromHtml(str) 
 		}.toImmutable
@@ -207,13 +207,15 @@ internal const class CsrfTokenTestModule {
 
 		csrfSetSessionFn := |->Text| {
 			ses.id
-			req.stash["afSleepSafe.csrfToken"] = ((|->Str|) req.stash["afSleepSafe.csrfTokenFn"])()
+			// removing the token ensures the fn will generate a new token
+			req.stash.remove("afSleepSafe.csrfToken")
 			return Text.fromPlain("Okay")
 		}.toImmutable
 		
 		csrfBadSessionFn := |->Text| {
 			req.stash["newSessionId"] = true
-			req.stash["afSleepSafe.csrfToken"] = ((|->Str|) req.stash["afSleepSafe.csrfTokenFn"])()
+			// removing the token ensures the fn will generate a new token
+			req.stash.remove("afSleepSafe.csrfToken")
 			return csrfHappy()			
 		}
 
