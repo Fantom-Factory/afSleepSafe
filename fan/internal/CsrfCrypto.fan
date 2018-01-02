@@ -31,7 +31,7 @@ internal const class CsrfCrypto {
 			salt		:= Buf.random(16)
 		    noOfBits	:= 128
 		    noOfBytes	:= noOfBits / 8
-		    iterations	:= iocEnv.isDev ? 0x10 : 0x10000
+		    iterations	:= iocEnv.isDev ? 0x10 : 0x6666
 		    keyBuf		:= Buf.pbk("PBKDF2WithHmacSHA256", passPhrase, salt, iterations, noOfBytes)
 			keyRef.val	= keyBuf.toImmutable
 
