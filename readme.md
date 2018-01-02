@@ -48,22 +48,12 @@ Class                   Guards Against                            Notes
 `ContentTypeGuard`      Content Sniffing                          Sets a 'X-Content-Type-Options' HTTP response header that tells browsers to trust the 'Content-Type' header
 `CsrfTokenGuard`        Cross Site Forgery Requests (CSRF)        Enforces an customisable Encrypted Token Pattern strategy
 `FrameOptionsGuard`     Clickjacking                              Sets an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame
-`ReferrerPolicyGuard`   Private / internal URL leaking            Sets a 'Referrer-Policy' HTTP response header that tells browsers how and when to transmit the HTTP Referer (sic) header
+`ReferrerPolicyGuard`   Private / Internal URL leaking            Sets a 'Referrer-Policy' HTTP response header that tells browsers how and when to transmit the HTTP Referer (sic) header
 `SameOriginGuard`       Cross Site Forgery Requests (CSRF)        Checks the 'Referer' or 'Origin' HTTP header matches the 'Host'
 `SessionHijackGuard`    Session Hijacking                         Caches browser user-agent parameters and checks them on each request, dropping the session if they change.
 `StrictTransportGuard`  Protocol Downgrades and Cookie Hijacking  Sets a 'Strict-Transport-Security' HTTP header that tells browsers to use HTTPS
 `XssProtectionGuard`    Cross Site Scripting (XSS)                Sets an 'X-XSS-Protection' HTTP header that tells browsers enable XSS filtering
 ```
-
-- [CspGuard](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/CspGuard) - Guards against Cross Site Scripting (XSS) by setting an `Content-Security-Policy` HTTP response header that tells browsers to restrict where content can be loaded from.
-- [CsrfTokenGuard](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/CsrfTokenGuard) - Guards against CSRF attacks by enforcing an customisable Encrypted Token Pattern strategy.
-- [FrameOptionsGuard](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/FrameOptionsGuard) - Guards against clickjacking by setting an `X-Frame-Options` HTTP response header that tells browsers not to embed the page in a frame.
-- [ReferrerPolicyGuard](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/ReferrerPolicyGuard) - Guards against internal URL leakage by setting a `Referrer-Policy` HTTP response header that tells browsers how and when to transmit the HTTP Referer (sic) header.
-- [SameOriginGuard](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/SameOriginGuard) - Guards against CSRF attacks by checking that the `Referer` or `Origin` HTTP header matches the `Host`.
-- [SessionHijackGuard](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/SessionHijackGuard) - Guards against Session hijacking by caching browser user-agent parameters and checking them on each request.
-- [StrictTransportGuard](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/StrictTransportGuard) - Guards against protocol downgrade attacks and Cookie hijacking by setting a `Strict-Transport-Security` HTTP response header that tells browsers to use HTTPS.
-- [ContentTypeGuard](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/ContentTypeGuard) - Guards against dodgy Content-Type sniffing by setting a `X-Content-Type-Options` HTTP response header that tells browsers to trust the `Content-Type` header.
-- [XssProtectionGuard](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/XssProtectionGuard) - Guards against Cross Site Scripting (XSS) by setting an `X-XSS-Protection` HTTP response header that tells browsers enable XSS filtering.
 
 See the individual class documentation for more details.
 
