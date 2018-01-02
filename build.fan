@@ -31,13 +31,12 @@ class Build : BuildPod {
 			// ---- Test ------------------------
 			"afBounce     1.1.7  - 1.1",	// *****
 			"afButter     1.2.6  - 1.2",
-			"afConcurrent 1.0.20 - 1.0",
 		]
 
 		srcDirs = [`fan/`, `fan/guards/`, `fan/internal/`, `fan/public/`, `test/`]
 		resDirs = [`doc/`]
 		
-		meta["afBuild.testPods"]	= "afBounce afButter afConcurrent"
+		meta["afBuild.testPods"]	= "afBounce afButter"
 		meta["afBuild.testDirs"]	= "test/"
 	}
 }
