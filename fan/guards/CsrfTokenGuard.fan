@@ -43,9 +43,9 @@ using afBedSheet
 ** where 'value' is obtained from:
 ** 
 **   syntax: fantom
-**   token := httpRequest.stash["afSleepSafe.csrfToken"]
+**   token := ((|->Str|) httpRequest.stash["afSleepSafe.csrfTokenFn"]).call()
 ** 
-** SleepSafe adds the CSRF token to the stash at the start of every request.
+** SleepSafe adds the CSRF token generation function to the stash at the start of every request.
 ** 
 ** Note that [FormBean]`pod:afFormBean` will automatically add the hidden input to every rendered form.
 ** 
@@ -137,8 +137,16 @@ const class CsrfTokenGuard : Guard {
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		httpReq.stash["afSleepSafe.csrfToken"]		= generateToken()
-		httpReq.stash["afSleepSafe.csrfTokenFn"]	= #generateToken.func.bind([this])		
+		// let's not do crypo stuff on *every* request but rather, only when we need it
+		// most requests will be for images, static pages, etc, and only rarely will we render a form
+		// httpReq.stash["afSleepSafe.csrfToken"]	= generateToken()
+		// httpReq.stash["afSleepSafe.csrfTokenFn"]	= #generateToken.func.bind([this])		
+
+		httpReq.stash["afSleepSafe.csrfTokenFn"] = |->Str| {
+			// cache token in the stash
+			// delete the token to force the fn to generate a new token
+			httpReq.stash.getOrAdd("afSleepSafe.csrfToken") { generateToken }
+		}
 
 		return fromVunerableUrl(httpReq) ? doProtection(httpReq, httpRes) : null
 	}

@@ -15,9 +15,9 @@ const class SleepSafeMiddleware : Middleware {
 					const Guard[]				guards
 	
 	private new make(Type:Guard guards, |This| f) {
+		f(this)		
 		// note: we can inject just "Guard[]" when we upgrade to afIoc 3.0.8  
 		this.guards = guards.vals
-		f(this)		
 	}
 	
 	@NoDoc
