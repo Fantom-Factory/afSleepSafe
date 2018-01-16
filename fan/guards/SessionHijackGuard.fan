@@ -54,19 +54,16 @@ const class SessionHijackGuard : Guard {
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		if (!httpSes.exists)
+		if (!httpSes.exists) {
+			httpSes.onCreate {
+				// cache the session hash params as soon as the session is created
+				it["afSleepSafe.sessionHash"] = hashSessionParams(httpReq)
+			}
 			return null
-		
-		map := Str:Str[:] { ordered = true }
-		headers.each |header| {
-			map[header] = httpReq.headers.val.get(header, "")
 		}
 		
-		hash := map.join(", ")
-		if (encrypt)
-			hash = hash.toBuf.toDigest("SHA-1").toBase64Uri
-		
-		reject := null as Str
+		hash	:= hashSessionParams(httpReq)
+		reject	:= null as Str
 		if (httpSes.containsKey("afSleepSafe.sessionHash")) {
 			oldHash := httpSes["afSleepSafe.sessionHash"]
 			if (oldHash != hash) {
@@ -77,10 +74,19 @@ const class SessionHijackGuard : Guard {
 
 		httpSes["afSleepSafe.sessionHash"] = hash
 		
-		// if the session is subsequently created in this request, then the user-agent params won't be cached until the next
-		// request! This gives a would be attacker a 1-request chance to sneak in right at the start. But given header values
-		// are easy to forge, any serious attack would easily bypass this Guard anyway.  
-		
 		return reject
+	}
+	
+	private Str hashSessionParams(HttpRequest httpReq) {
+		map := Str:Str[:] { ordered = true }
+		headers.each |header| {
+			map[header] = httpReq.headers.val.get(header, "")
+		}
+		
+		hash := map.join(", ")
+		if (encrypt)
+			hash = hash.toBuf.toDigest("SHA-1").toBase64Uri
+		
+		return hash
 	}
 }

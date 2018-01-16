@@ -9,10 +9,7 @@ internal class TestSessionHijackGuard : SleepSafeTest {
 	Void testDefaultHappyCase() {
 		fireUp([SessionHijackTestModule#])
 
-		client.get(`/setSession`)
-		verifyNotNull(client.webSession)
-
-		res := client.sendRequest(ButterRequest(`/get`) {
+		res := client.sendRequest(ButterRequest(`/setSession`) {
 			it.headers.userAgent = "afButter"
 			it.headers.acceptLanguage = QualityValues("da")
 		})		
@@ -33,10 +30,7 @@ internal class TestSessionHijackGuard : SleepSafeTest {
 	Void testUserAgentOnly() {
 		fireUp([SessionHijackTestModule#])
 
-		client.get(`/setSession`)
-		verifyNotNull(client.webSession)
-
-		res := client.sendRequest(ButterRequest(`/hasSession`) {
+		res := client.sendRequest(ButterRequest(`/setSession`) {
 			it.headers.userAgent = "afButter"
 		})		
 		verifyEq(res.statusCode, 200)
@@ -55,10 +49,7 @@ internal class TestSessionHijackGuard : SleepSafeTest {
 	Void testAcceptLangOnly() {
 		fireUp([SessionHijackTestModule#])
 
-		client.get(`/setSession`)
-		verifyNotNull(client.webSession)
-
-		res := client.sendRequest(ButterRequest(`/get`) {
+		res := client.sendRequest(ButterRequest(`/setSession`) {
 			it.headers.acceptLanguage = QualityValues("en")
 		})		
 		verifyEq(res.statusCode, 200)
@@ -77,9 +68,7 @@ internal class TestSessionHijackGuard : SleepSafeTest {
 	Void testEncrypt() {
 		fireUp([SessionHijackTestModule#], ["afSleepSafe.sessionHijackEncrypt":false])
 
-		client.get(`/setSession`)
-
-		res := client.sendRequest(ButterRequest(`/get`) {
+		res := client.sendRequest(ButterRequest(`/setSession`) {
 			it.headers.userAgent = "007"
 			it.headers.acceptLanguage = QualityValues("en")
 		})		
@@ -96,9 +85,7 @@ internal class TestSessionHijackGuard : SleepSafeTest {
 	Void testCustomHeaders() {
 		fireUp([SessionHijackTestModule#], ["afSleepSafe.sessionHijackEncrypt":false, "afSleepSafe.sessionHijackHeaders":"wot, ever"])
 
-		client.get(`/setSession`)
-
-		res := client.sendRequest(ButterRequest(`/get`) {
+		res := client.sendRequest(ButterRequest(`/setSession`) {
 			it.headers["wot"]  = "foo"
 			it.headers["ever"] = "bar"
 		})
