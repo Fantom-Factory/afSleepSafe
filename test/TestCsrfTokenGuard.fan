@@ -207,15 +207,11 @@ internal const class CsrfTokenTestModule {
 
 		csrfSetSessionFn := |->Text| {
 			ses.id
-			// removing the token ensures the fn will generate a new token
-			req.stash.remove("afSleepSafe.csrfToken")
 			return Text.fromPlain("Okay")
 		}.toImmutable
 		
 		csrfBadSessionFn := |->Text| {
-			req.stash["newSessionId"] = true
-			// removing the token ensures the fn will generate a new token
-			req.stash.remove("afSleepSafe.csrfToken")
+			req.stash["newSessionId"] = true	// to be picked up by a custom guard
 			return csrfHappy()			
 		}
 
