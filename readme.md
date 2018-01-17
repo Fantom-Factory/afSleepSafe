@@ -1,8 +1,8 @@
-#Sleep Safe v0.0.0
+#Sleep Safe v0.0.2
 ---
 
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
-[![pod: v0.0.0](http://img.shields.io/badge/pod-v0.0.0-yellow.svg)](http://www.fantomfactory.org/pods/afSleepSafe)
+[![pod: v0.0.2](http://img.shields.io/badge/pod-v0.0.2-yellow.svg)](http://www.fantomfactory.org/pods/afSleepSafe)
 ![Licence: ISC Licence](http://img.shields.io/badge/licence-ISC Licence-blue.svg)
 
 ## Overview

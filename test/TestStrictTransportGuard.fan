@@ -5,7 +5,7 @@ internal class TestStrictTransportGuard : SleepSafeTest {
 	
 	Void testDefaultConfig() {
 		fireUp
-		res := client.get(`/get`)
+		res := client.get(`/getHtml`)
 		verifyFalse(res.headers.val.containsKey("Strict-Transport-Security"))
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")
@@ -13,7 +13,7 @@ internal class TestStrictTransportGuard : SleepSafeTest {
 
 	Void testHstsBasic() {
 		fireUp([StrictTransportMod1#])
-		res := client.get(`/get`)
+		res := client.get(`/getHtml`)
 		verifyEq(res.headers.strictTransportSecurity, "max-age=86400")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")
@@ -21,7 +21,7 @@ internal class TestStrictTransportGuard : SleepSafeTest {
 
 	Void testHstsAll() {
 		fireUp([StrictTransportMod2#])
-		res := client.get(`/get`)
+		res := client.get(`/getHtml`)
 		verifyEq(res.headers.strictTransportSecurity, "max-age=63072000; includeSubDomains; preload")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")

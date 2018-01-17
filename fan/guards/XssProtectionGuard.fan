@@ -57,7 +57,13 @@ const class XssProtectionGuard : Guard {
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		httpRes.headers.xXssProtection = xssProtection
+		// don't bother setting headers for non-HTML files
+		// https://stackoverflow.com/questions/48151455/for-which-content-types-should-i-set-security-related-http-response-headers
+		httpRes.onCommit |->| {
+			contentType := httpRes.headers.contentType?.noParams?.toStr?.lower
+			if (contentType == "text/html" || contentType == "application/xhtml+xml")
+				httpRes.headers.xXssProtection = xssProtection
+		}
 		return null
 	}
 }
