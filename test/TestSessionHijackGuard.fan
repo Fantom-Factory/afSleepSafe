@@ -18,7 +18,7 @@ internal class TestSessionHijackGuard : SleepSafeTest {
 		verifyNotNull(client.webSession)
 
 		client.errOn4xx.enabled = false
-		res = client.sendRequest(ButterRequest(`/get`) {
+		res = client.sendRequest(ButterRequest(`/getHtml`) {
 			it.headers.userAgent = "afRuby"
 			it.headers.acceptLanguage = QualityValues("niet")
 		})		
@@ -57,7 +57,7 @@ internal class TestSessionHijackGuard : SleepSafeTest {
 		verifyNotNull(client.webSession)
 
 		client.errOn4xx.enabled = false
-		res = client.sendRequest(ButterRequest(`/get`) {
+		res = client.sendRequest(ButterRequest(`/getHtml`) {
 			it.headers.acceptLanguage = QualityValues("ru")
 		})		
 		verifyEq(res.statusCode, 403)
@@ -74,7 +74,7 @@ internal class TestSessionHijackGuard : SleepSafeTest {
 		})		
 
 		client.errOn4xx.enabled = false
-		res = client.sendRequest(ButterRequest(`/get`) {
+		res = client.sendRequest(ButterRequest(`/getHtml`) {
 			it.headers.userAgent = "rominov"
 			it.headers.acceptLanguage = QualityValues("ru")
 		})		
@@ -91,7 +91,7 @@ internal class TestSessionHijackGuard : SleepSafeTest {
 		})
 
 		client.errOn4xx.enabled = false
-		res = client.sendRequest(ButterRequest(`/get`))
+		res = client.sendRequest(ButterRequest(`/getHtml`))
 		verifyEq(res.statusCode, 403)
 		verifyEq(res.body.str, "403 - Suspected Cookie Hijacking - Session parameters have changed: wot: foo, ever: bar != wot: , ever: ")
 	}

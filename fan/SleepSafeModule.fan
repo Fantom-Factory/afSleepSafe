@@ -73,7 +73,7 @@ const class SleepSafeModule {
 					throw Err("Session ID mismatch")
 			}
 			// if no sId but HTTP session exists...
-			// that's normal 'cos the session is normally created *after* the token is generated
+			// that's normal if the session is created *after* the token is generated
 			// don't force the user to re-gen the csrf token - we're supposed to be invisible (almost!)
 		}
 	}

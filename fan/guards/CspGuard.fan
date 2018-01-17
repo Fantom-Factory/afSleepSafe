@@ -99,11 +99,29 @@ const class CspGuard : Guard {
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		if (csp != null)
+		if (csp != null) {
+			// set the headers at the start of the request so other code may add or manipulate it
 			if (reportOnly)
 				httpRes.headers["Content-Security-Policy-Report-Only"] = csp
 			else
 				httpRes.headers["Content-Security-Policy"] = csp
+
+			// don't bother setting the CSP header for non-HTML files
+			// https://stackoverflow.com/questions/48151455/for-which-content-types-should-i-set-security-related-http-response-headers
+			httpRes.onCommit |->| {
+				contentType := httpRes.headers.contentType?.noParams?.toStr?.lower
+				if (contentType == "text/html" || contentType == "application/xhtml+xml")
+					return
+				
+				// if it's not a HTML page, then remove the headers
+				if (reportOnly) {
+					httpRes.headers["Content-Security-Policy-Report-Only"] = null 
+				} else {
+					httpRes.headers["Content-Security-Policy"] = null
+				}
+			}
+		}
+		
 		return null
 	}
 }

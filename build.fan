@@ -6,7 +6,7 @@ class Build : BuildPod {
 	new make() {
 		podName = "afSleepSafe"
 		summary = "Sleep safe knowing you're guarded against CSFR, XSS, and other web attacks"
-		version = Version("0.0.1")
+		version = Version("0.0.3")
 
 		meta = [
 			"pod.dis"		: "Sleep Safe",
@@ -30,7 +30,7 @@ class Build : BuildPod {
 
 			// ---- Test ------------------------
 			"afBounce     1.1.7  - 1.1",	// *****
-			"afButter     1.2.6  - 1.2",
+			"afButter     1.2.7  - 1.2",	// *****
 		]
 
 		srcDirs = [`fan/`, `fan/guards/`, `fan/internal/`, `fan/public/`, `test/`]

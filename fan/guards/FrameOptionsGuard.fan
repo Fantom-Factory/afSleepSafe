@@ -46,7 +46,16 @@ const class FrameOptionsGuard : Guard {
 
 	@NoDoc
 	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
-		httpRes.headers.xFrameOptions = frameOptions
+		if (frameOptions != null)
+
+			// don't bother setting headers for non-HTML files
+			// https://stackoverflow.com/questions/48151455/for-which-content-types-should-i-set-security-related-http-response-headers
+			httpRes.onCommit |->| {
+				contentType := httpRes.headers.contentType?.noParams?.toStr?.lower
+				if (contentType == "text/html" || contentType == "application/xhtml+xml")
+					httpRes.headers.xFrameOptions = frameOptions
+			}
+
 		return null
 	}
 }

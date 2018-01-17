@@ -3,14 +3,14 @@ using afConcurrent::AtomicList
 internal class TestCspGuard : SleepSafeTest {
 
 	Void testDefaultHeaders() {
-		res := fireUp.get(`/get`)
+		res := fireUp.get(`/getHtml`)
 		verifyEq(res.headers["Content-Security-Policy"], "base-uri 'self'; default-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; report-uri /_sleepSafeCspViolation")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")
 	}
 
 	Void testDefaultReporting() {
-		fireUp.get(`/get`)	// warm up
+		fireUp.get(`/getHtml`)	// warm up
 
 		logs		:= AtomicList()
 		handlerRef	:= Unsafe(|LogRec rec| { logs.add(rec) })
@@ -36,7 +36,7 @@ internal class TestCspGuard : SleepSafeTest {
 			"afSleepSafe.csp.default-src"		: null,
 			"afSleepSafe.csp.object-src"		: null,
 			"afSleepSafe.csp.big"				: "balloons",
-		]).get(`/get`)
+		]).get(`/getHtml`)
 		verifyEq(res.headers["Content-Security-Policy"], "big balloons; report-uri /_sleepSafeCspViolation")
 		verifyEq(res.statusCode, 200)
 		verifyEq(res.body.str, "Okay")		
@@ -45,7 +45,7 @@ internal class TestCspGuard : SleepSafeTest {
 	Void testDisableReporting1() {
 		fireUp([,], [
 			"afSleepSafe.csp.report-uri"	: null,
-		]).get(`/get`)
+		]).get(`/getHtml`)
 
 		logs		:= AtomicList()
 		handlerRef	:= Unsafe(|LogRec rec| { logs.add(rec) })
@@ -64,7 +64,7 @@ internal class TestCspGuard : SleepSafeTest {
 	Void testDisableReporting2() {
 		fireUp([,], [
 			"afSleepSafe.cspReportFn"	: null,
-		]).get(`/get`)
+		]).get(`/getHtml`)
 
 		logs		:= AtomicList()
 		handlerRef	:= Unsafe(|LogRec rec| { logs.add(rec) })
@@ -96,9 +96,18 @@ internal class TestCspGuard : SleepSafeTest {
 		logs		:= AtomicList()
 		res := fireUp([,], [
 			"afSleepSafe.cspReportOnly"	: true,
-		]).get(`/get`)
+		]).get(`/getHtml`)
 
 		verifyNull(res.headers.contentSecurityPolicy)
 		verifyNotNull(res.headers.contentSecurityPolicyReportOnly)
+	}
+
+	Void testCspIsForHtmlOnly() {
+		res := fireUp.get(`/getPlain`)
+		verifyEq(res.statusCode, 200)
+		verifyEq(res.body.str, "Okay")
+
+		verifyNull(res.headers.contentSecurityPolicy)
+		verifyNull(res.headers.contentSecurityPolicyReportOnly)
 	}
 }

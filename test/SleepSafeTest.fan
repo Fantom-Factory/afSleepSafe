@@ -42,7 +42,8 @@ internal const class WebTestModule {
 			return Text.fromPlain("Post, nom=" + val)
 		}.toImmutable
 
-		config.add(Route(`/get`,					Text.fromPlain("Okay")))
+		config.add(Route(`/getPlain`,				Text.fromPlain("Okay")))
+		config.add(Route(`/getHtml`,				Text.fromHtml ("Okay")))
 		config.add(Route(`/post`,					postFn,  "POST"))
 		config.add(Route(`/post2`,					post2Fn, "POST"))
 	}
