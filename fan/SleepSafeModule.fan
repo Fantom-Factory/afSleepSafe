@@ -23,7 +23,7 @@ const class SleepSafeModule {
 		config["afSleepSafe.logGuards"] = |->| {
 			middleware := (SleepSafeMiddleware) scope.serviceById(SleepSafeMiddleware#.qname)
 			msg := "SleepSafe knowing your application is protected against: "
-			msg += middleware.guards.rw.sort.join(", ") { it.protectsAgainst }
+			msg += middleware.guards.map { it.protectsAgainst }.unique.sort.join(", ")
 			typeof.pod.log.info(msg)
 		}
 	}
