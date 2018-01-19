@@ -69,7 +69,8 @@ const class SameOriginGuard : Guard {
 			host := bedServer.host
 
 			referrer := httpReq.headers.referrer?.plus(`/`)	// delete the path component
-			if (referrer != null) {
+			// referrer is optional and may be relative - see https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.36
+			if (referrer != null && referrer.isAbs) {
 				if (host != referrer && !whitelist.contains(referrer))
 					return csrfErr("Referrer does not match Host: ${referrer} != ${host}" + (whitelist.isEmpty ? "" : ", " + whitelist.join(", ")))
 			}
