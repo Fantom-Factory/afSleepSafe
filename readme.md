@@ -1,8 +1,8 @@
-#Sleep Safe v0.0.2
+#Sleep Safe v1.0.0
 ---
 
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
-[![pod: v0.0.2](http://img.shields.io/badge/pod-v0.0.2-yellow.svg)](http://www.fantomfactory.org/pods/afSleepSafe)
+[![pod: v1.0.0](http://img.shields.io/badge/pod-v1.0.0-yellow.svg)](http://www.fantomfactory.org/pods/afSleepSafe)
 ![Licence: ISC Licence](http://img.shields.io/badge/licence-ISC Licence-blue.svg)
 
 ## Overview
@@ -28,7 +28,7 @@ Or install `Sleep Safe` with [fanr](http://fantom.org/doc/docFanr/Tool.html#inst
 
 To use in a [Fantom](http://fantom-lang.org/) project, add a dependency to `build.fan`:
 
-    depends = ["sys 1.0", ..., "afSleepSafe 0.0"]
+    depends = ["sys 1.0", ..., "afSleepSafe 1.0"]
 
 ## Documentation
 

@@ -206,15 +206,14 @@ const class CsrfTokenGuard : Guard {
 	}
 	
 	private Str generateToken() {
-		hash := [:] { ordered = true }
+		hash := Str:Obj?[:] { ordered = true }
 		genFuncs.call(hash)
 		
 		code := Buf().writeObj(hash).flip.readAllStr
-		if (code.startsWith("[sys::Obj:sys::Obj?]"))
+		if (code.startsWith("[sys::Str:sys::Obj?]"))
 			code = code[20..-1]
 		code = code.replace("sys::", "")
 		code = code[2..<-1]
-
 		return crypto.encode(code)
 	}
 	
