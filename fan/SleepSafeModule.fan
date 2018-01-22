@@ -94,7 +94,9 @@ const class SleepSafeModule {
 	
 	@Contribute { serviceType=MiddlewarePipeline# }
 	Void contributeMiddleware(Configuration config, SleepSafeMiddleware middleware) {
-		config.set("SleepSafeMiddleware", middleware).before("afBedSheet.routes")
+		// given the Session Hijack guard needs to load the session cookie (potentially from a database)
+		// lets not protect *every* request, but let static assets slip through
+		config.set("SleepSafeMiddleware", middleware).after("afBedSheet.assets").before("afBedSheet.routes")
 	}
 
 	@Contribute { serviceType=FactoryDefaults# }
