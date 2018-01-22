@@ -57,6 +57,8 @@ Class                   Guards Against                            Notes
 
 See the individual class documentation for more details.
 
+Guards are invoked by [SleepSafe BedSheet Middleware](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/SleepSafeMiddleware) which is configured before `afBedSheet.routes` but *after* `afBedSheet.assets`. This is because some guards may be processor and / or IO intensive and static asset files usually need not be protected. If you prefere SleepSafe be run on *every* request, then overwrite the Middleware contribution.
+
 ## IoC Configuration
 
 When a Guard rejects a HTTP request, it processes a standard BedSheet `HttpStatus` object with a `403 - Forbidden` status code. This is then handled by BedSheet in the usual manner, for you to override - see [HTTP Status Processing](http://eggbox.fantomfactory.org/pods/afBedSheet/doc/#httpStatusProcessing).
