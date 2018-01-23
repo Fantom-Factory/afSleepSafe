@@ -87,6 +87,7 @@ using afBedSheet
 **   Void contributeAppDefaults(Configuration config) {
 **       config["afSleepSafe.csrfTokenName"]    = "clickFast"
 **       config["afSleepSafe.csrfTokenTimeout"] = 2sec
+**       config["afSleepSafe.csrfPassPhrase"]   = "Fantom Rocks!"
 **   }
 ** 
 ** To disable CSRF checking, remove this class from the 'SleepSafeMiddleware' configuration:

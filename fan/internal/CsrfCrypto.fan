@@ -30,15 +30,16 @@ internal const class CsrfCrypto {
 	Void generateKey() {
 		futureRef.val = thread.async |->| {
 			
-			// generate our own random key if none supplied
-			passPhrase	:= "Fanny the Fantom -> Escape the Mainframe!"
-			salt		:= Buf.random(16)
-			
-			// else use the user supplied pass phrase - this lets tokens be used accross server restarts
-			if (csrfPassPhrase != null) {
-				passPhrase	= csrfPassPhrase
-				// need to keep the salt the same to generate the same key, so here's one I made earlier
-				salt		= Buf.fromBase64("cGEmBLnzakNWRBbfeJCzdw")
+			// use the user supplied pass phrase - this lets tokens be used accross server restarts
+			passPhrase	:= csrfPassPhrase ?: ""
+
+			// need to keep the salt the same to generate the same key, so here's one I made earlier
+			salt		:= Buf.fromBase64("cGEmBLnzakNWRBbfeJCzdw")
+
+			// or generate our own random key if none supplied
+			if (csrfPassPhrase == null) {
+				passPhrase	= Buf.random(42).toBase64Uri
+				salt		= Buf.random(16)
 			}
 			
 		    noOfBits	:= 128
