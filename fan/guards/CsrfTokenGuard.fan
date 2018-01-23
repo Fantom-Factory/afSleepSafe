@@ -78,6 +78,7 @@ using afBedSheet
 **   ------------------------------  ------------
 **   'afSleepSafe.csrfTokenName'     Name of the posted form field that holds the CSRF token. Defaults to '_csrfToken'.
 **   'afSleepSafe.csrfTokenTimeout'  How long CSRF tokens have to live. Set to 'null' to disable timeouts. Defaults to '60min'.
+**   'afSleepSafe.csrfPassPhrase'    The pass phrase used to generate the encryption secret key. Generated CSRF tokens can only be used across server restarts if this is set. If 'null' (default) then a random pass phrase is generated each time the sever starts.
 ** 
 ** Example:
 ** 

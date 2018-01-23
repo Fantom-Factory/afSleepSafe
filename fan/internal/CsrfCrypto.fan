@@ -1,5 +1,6 @@
 using afIoc::Inject
 using afIocEnv::IocEnv
+using afIocConfig::Config
 using afConcurrent::Synchronized
 using concurrent::Future
 using concurrent::AtomicRef
@@ -20,6 +21,7 @@ internal const class CsrfCrypto {
 			private const AtomicRef		futureRef		:= AtomicRef(null)
 			private const AtomicRef		keyRef			:= AtomicRef(null)
 			private const AtomicRef		initVectorRef	:= AtomicRef(null)
+	@Config	private const Str?			csrfPassPhrase
 
 	private new make(|This| f) { f(this) }
 
@@ -27,21 +29,27 @@ internal const class CsrfCrypto {
 	** we do it in the background.
 	Void generateKey() {
 		futureRef.val = thread.async |->| {
+			
+			// generate our own random key if none supplied
 			passPhrase	:= "Fanny the Fantom -> Escape the Mainframe!"
 			salt		:= Buf.random(16)
+			
+			// else use the user supplied pass phrase - this lets tokens be used accross server restarts
+			if (csrfPassPhrase != null) {
+				passPhrase	= csrfPassPhrase
+				// need to keep the salt the same to generate the same key, so here's one I made earlier
+				salt		= Buf.fromBase64("cGEmBLnzakNWRBbfeJCzdw")
+			}
+			
 		    noOfBits	:= 128
 		    noOfBytes	:= noOfBits / 8
 		    iterations	:= iocEnv.isDev ? 0x10 : 0x6666
 		    keyBuf		:= Buf.pbk("PBKDF2WithHmacSHA256", passPhrase, salt, iterations, noOfBytes)
 			keyRef.val	= keyBuf.toImmutable
-
-			keySpec	:= SecretKeySpec(toBytes(keyRef.val), "AES")
-			cipher	:= Cipher.getInstance("AES/CBC/PKCS5Padding")
+			
+			keySpec		:= SecretKeySpec(toBytes(keyRef.val), "AES")
+			cipher		:= Cipher.getInstance("AES/CBC/PKCS5Padding")
 			cipher.init(Cipher.ENCRYPT_MODE, keySpec)
-
-			// getParameterSpec() has some knarly Java generics which I can't figure out how to create in Fantom : "<T extends AlgorithmParameterSpec>"
-			// Note, java.lang.Class.asSubclass() does seem to work - maybe 'cos Fantom then assigns to a general 'Class' obj
-			// Anyway, just invoke it via reflection and all is okay
 			specClass	:= Class.forName("javax.crypto.spec.IvParameterSpec")
 			initVector	:= ((IvParameterSpec) AlgorithmParameters#getParameterSpec.call(cipher.getParameters, specClass)).getIV
 			initVectorRef.val = toBuf(initVector).toImmutable
@@ -55,17 +63,20 @@ internal const class CsrfCrypto {
 		ivSpec		:= IvParameterSpec(toBytes(initVectorRef.val))
 		cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
 		cipherText	:= cipher.doFinal(toBytes(msg.toBuf))
-		token		:= toBuf(cipherText).toBase64Uri
-		return token
+		token		:= toBuf(cipherText)
+
+		// need to embed the init vector so the token can be used across server restarts
+		return token.toBase64Uri + ":" + ((Buf) initVectorRef.val).toBase64Uri
 	}
 
 	Str decode(Str cipherText) {
+		split		:= cipherText.split(':')
 		keyBuf		:= secretKey
 		keySpec		:= SecretKeySpec(toBytes(keyBuf), "AES")
 		cipher		:= Cipher.getInstance("AES/CBC/PKCS5Padding")
-		ivSpec		:= IvParameterSpec(toBytes(initVectorRef.val))
+		ivSpec		:= IvParameterSpec(toBytes(Buf.fromBase64(split[1])))
 		cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
-		plainText	:= cipher.doFinal(toBytes(Buf.fromBase64(cipherText)))
+		plainText	:= cipher.doFinal(toBytes(Buf.fromBase64(split[0])))
 		return toBuf(plainText).readAllStr.trim
 	}
 
