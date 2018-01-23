@@ -10,10 +10,13 @@ internal abstract class SleepSafeTest : Test {
 	
 	BedClient fireUp(Type[] mods := [,], [Str:Obj?]? appConfig := null) {
 		Actor.locals["test.appConfig"] = appConfig
+		Log.get("afBedSheet").level = LogLevel.warn
 		server = BedServer(SleepSafeModule#.pod)
+			.silenceBuilder
 			.addModule(WebTestModule#)
 			.addModules(mods)
 			.startup
+		Log.get("afBedSheet").level = LogLevel.info
 		server.inject(this)
 		client = server.makeClient
 		
@@ -26,6 +29,10 @@ internal abstract class SleepSafeTest : Test {
 }
 
 internal const class WebTestModule {
+	
+	Void defineServices(RegistryBuilder bob) {
+		bob.silent
+	}
 
 	@Contribute { serviceType=Routes# }
 	Void contributeRoutes(Configuration config) {
@@ -55,11 +62,7 @@ internal const class WebTestModule {
 	}
 
 	Void onRegistryStartup(Configuration config) {
-		config.remove("afIoc.logBanner",		"afIoc.silentBanner")
-		config.remove("afIoc.logServices",		"afIoc.silentServices")
-		config.remove("afIoc.logStartupTimes",	"afIoc.silentStartupTimes")
-	}
-	Void onRegistryShutdown(Configuration config) {
-		config.remove("afIoc.sayGoodbye", "afIoc.silentBoodbye")
+		config.remove("afIocEnv.logEnv")
+		config.remove("afSleepSafe.logGuards")
 	}
 }
