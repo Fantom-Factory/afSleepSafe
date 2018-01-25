@@ -104,7 +104,7 @@ const class SleepSafeModule {
 		config["afSleepSafe.rejectedStatusCode"]	= "403"
 		
 		config["afSleepSafe.csrfTokenName"]			= "_csrfToken"
-		config["afSleepSafe.csrfTokenTimeout"]		= "60min"
+		config["afSleepSafe.csrfTokenTimeout"]		= "61min"	// ensure user sessions time out before CSRF tokens
 		config["afSleepSafe.frameOptions"]			= "SAMEORIGIN"
 		config["afSleepSafe.referrerPolicy"]		= "no-referrer, strict-origin-when-cross-origin"
 		config["afSleepSafe.sameOriginWhitelist"]	= ""
