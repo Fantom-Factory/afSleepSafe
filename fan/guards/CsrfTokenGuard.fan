@@ -113,7 +113,7 @@ using afBedSheet
 **   @Contribute { serviceType=CsrfTokenValidation# }
 **   private Void contributeCsrfTokenValidation(Configuration config) {
 **       config["user"] = |Str:Obj? hash| {
-**           if (hash.containsKey["user"])
+**           if (hash.containsKey("user"))
 **               if (hash["user"] != "Princess Daisy")
 **                   throw Err("User is not a Princess!")
 **       }
