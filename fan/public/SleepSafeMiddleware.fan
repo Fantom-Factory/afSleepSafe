@@ -2,7 +2,22 @@ using afIoc::Inject
 using afIocConfig::Config
 using afBedSheet
 
-** BedSheet middleware that is run before any BedSheet routing.  
+** BedSheet middleware that invokes the Guards.
+** 
+** 'SleepSafeMiddleware' is contributed with the following:
+** 
+** pre>
+** syntax: fantom
+** 
+** @Contribute { serviceType=MiddlewarePipeline# }
+** Void contributeMiddleware(Configuration config, SleepSafeMiddleware middleware) {
+**     config.set("SleepSafeMiddleware", middleware).after("afBedSheet.assets").before("afBedSheet.routes")
+** }
+** <pre
+** 
+** Assets are not purposely not protected to prevent HTTP sessions being loaded (potentially from a database) on *every* 
+** request. Override Middleware ordering to change this behaviour.
+**
 const class SleepSafeMiddleware : Middleware {
 	
 	@Inject private const Log					log
