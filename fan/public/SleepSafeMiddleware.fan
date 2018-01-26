@@ -11,7 +11,7 @@ using afBedSheet
 ** 
 ** @Contribute { serviceType=MiddlewarePipeline# }
 ** Void contributeMiddleware(Configuration config, SleepSafeMiddleware middleware) {
-**     config.set("SleepSafeMiddleware", middleware).after("afBedSheet.assets").before("afBedSheet.routes")
+**     config.set("afSleepSafe.guards", middleware).after("afBedSheet.assets").before("afBedSheet.routes")
 ** }
 ** <pre
 ** 
