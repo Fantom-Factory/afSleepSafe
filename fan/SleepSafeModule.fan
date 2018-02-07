@@ -101,6 +101,8 @@ const class SleepSafeModule {
 
 	@Contribute { serviceType=FactoryDefaults# }
 	Void contributeFactoryDefaults(Configuration config) {
+		scope := config.scope
+		
 		config["afSleepSafe.rejectedStatusCode"]	= "403"
 		
 		config["afSleepSafe.csrfTokenName"]			= "_csrfToken"
@@ -121,8 +123,9 @@ const class SleepSafeModule {
 		config["afSleepSafe.csp.report-uri"]		= "/_sleepSafeCspViolation"
 		config["afSleepSafe.cspReportOnly"]			= false
 		config["afSleepSafe.cspReportFn"]			= |Str:Obj? report| {
+			httpReq := (HttpRequest) scope.serviceById(HttpRequest#.qname)
 			txt := JsonWriter(true).writeJson(report)
-			typeof.pod.log.warn("Content-Security-Policy Violation:\n${txt}")
+			typeof.pod.log.warn("Content-Security-Policy Violation:\nUser-Agent: ${httpReq.headers.userAgent}\n${txt}")
 		}
 	}
 

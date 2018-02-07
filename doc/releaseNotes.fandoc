@@ -1,5 +1,6 @@
-Release Notes
-*************
+v1.0.2
+======
+ - Chg: CSP report function now also prints out the 'User-Agent' header.
 
 v1.0.0
 ======
