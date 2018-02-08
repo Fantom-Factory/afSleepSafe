@@ -55,11 +55,12 @@ const class SleepSafeModule {
 	}
 
 	@Contribute { serviceType=CsrfTokenValidation# }
-	Void contributeCsrfTokenValidation(Configuration config, ConfigSource configSrc, HttpSession httpSession) {
+	Void contributeCsrfTokenValidation(Configuration config, ConfigSource configSrc, HttpRequest httpRequest, HttpSession httpSession) {
 		config["timestamp"] = |Str:Obj? hash| {
 			timeout 	:= (Duration)  configSrc.get("afSleepSafe.csrfTokenTimeout", Duration#)
 			timestamp	:= Base64.fromB64(hash.get("ts", "0")) * 1ms.ticks
 			duration	:= Duration(DateTime.nowTicks - timestamp)
+			httpRequest.stash["afSleepSafe.csrf.tokenTs"] = DateTime.makeTicks(timestamp)
 			if (duration >= timeout)
 				throw Err("Token exceeds ${timeout} timeout: ${duration}")
 		}
