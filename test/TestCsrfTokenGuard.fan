@@ -230,11 +230,6 @@ internal const class CsrfTokenTestModule {
 		config.add(Route(`/csrfSetSession`,			csrfSetSessionFn))
 		config.add(Route(`/csrfBadSession`,			csrfBadSessionFn))
 	}
-	
-	@Contribute { serviceType=SleepSafeMiddleware# }
-	Void contributeSleepSafeMiddleware(Configuration config) {
-		config.remove(SameOriginGuard#)
-	}
 }
 
 internal const class CsrfCustomGenFuncMod1 {

@@ -114,15 +114,9 @@ internal const class NoCsrfTokenMod {
 	@Contribute { serviceType=SleepSafeMiddleware# }
 	Void contributeSleepSafeMiddleware(Configuration config) {
 		config.remove(CsrfTokenGuard#)
+		config[SameOriginGuard#] = config.build(SameOriginGuard#)
 	}
 }
-
-//internal const class AltBedSheetHostTestMod {
-//	@Contribute { serviceType=ApplicationDefaults# }
-//	Void contributeApplicationDefaults(Configuration config) {
-//		config["afBedSheet.host"] = `http://alt.example.com`
-//	}
-//}
 
 internal const class OriginWhitelistTestMod {
 	@Contribute { serviceType=ApplicationDefaults# }

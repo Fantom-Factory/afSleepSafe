@@ -11,7 +11,7 @@ using afBedSheet::BedSheetServer
 ** The 'Host' parameter is determined from [BedSheetServer.host()]`afBedSheet::BedSheetServer.host` and is usually picked up
 ** from the 'BedSheetConfigIds.host' config value.
 ** 
-** Requests are also denied if neither the 'Referer' and 'Origin' HTTP header are present. 
+** Requests are also denied if neither the 'Referer' nor 'Origin' HTTP header are present. 
 ** 
 ** See [Cross-Site Request Forgery (CSRF) Prevention Cheat Sheet]`https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#Verifying_Same_Origin_with_Standard_Headers` for details.
 ** 
@@ -19,6 +19,19 @@ using afBedSheet::BedSheetServer
 ** 
 ** Ioc Configuration
 ** *****************
+** 'SameOriginGuard' is disabled by default as a referrer policy is preferred. 
+** For if a 'no-referrer' policy is enforced (either explicitly or as an older browser fall back) then, more than likely, this 
+** guard will fail!
+**   
+** To enable, contribute this class to the 'SleepSafeMiddleware' configuration:
+** 
+**   syntax: fantom 
+**   @Contribute { serviceType=SleepSafeMiddleware# }
+**   Void contributeSleepSafeMiddleware(Configuration config) {
+**       config[SameOriginGuard#] = config.build(SameOriginGuard#)
+**   }
+**
+** Then to configure an origin whitelist:
 ** 
 **   table:
 **   afIocConfig Key                    Value
@@ -41,19 +54,11 @@ using afBedSheet::BedSheetServer
 **       config["afBedSheet.host"] = `https://example.com`
 **   }
 ** 
-** To disable CSRF referrer checking, remove this class from the 'SleepSafeMiddleware' configuration:
-** 
-**   syntax: fantom 
-**   @Contribute { serviceType=SleepSafeMiddleware# }
-**   Void contributeSleepSafeMiddleware(Configuration config) {
-**       config.remove(SameOriginGuard#)
-**   }
-** 
 const class SameOriginGuard : Guard {
 
 	@Inject	private const BedSheetServer	bedServer
 			private const Uri[]				whitelist
-
+	
 	private new make(ConfigSource configSrc, |This| f) {
 		f(this)
 		csv		 := (Str) configSrc.get("afSleepSafe.sameOriginWhitelist", Str#)

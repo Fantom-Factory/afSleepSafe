@@ -123,6 +123,5 @@ internal const class SessionHijackTestModule {
 	@Contribute { serviceType=SleepSafeMiddleware# }
 	Void contributeSleepSafeMiddleware(Configuration config) {
 		config.remove(CsrfTokenGuard#)
-		config.remove(SameOriginGuard#)
 	}
 }

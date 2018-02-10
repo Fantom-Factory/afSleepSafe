@@ -31,7 +31,6 @@ const class SleepSafeModule {
 	@Contribute { serviceType=SleepSafeMiddleware# }
 	Void contributeSleepSafeMiddleware(Configuration config) {
 		// request checkers
-		config[SameOriginGuard#]	= config.build(SameOriginGuard#)
 		config[SessionHijackGuard#]	= config.build(SessionHijackGuard#)
 		config[CsrfTokenGuard#]		= config.build(CsrfTokenGuard#)
 		
