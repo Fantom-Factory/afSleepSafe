@@ -25,7 +25,7 @@ internal class TestCspGuard : SleepSafeTest {
 
 		log := (LogRec) logs.first
 		verifyEq(log.level, LogLevel.warn)
-		verifyEq(log.msg, "Content-Security-Policy Violation:\n{\"big\": \"balloons\"}")
+		verifyEq(log.msg, "Content-Security-Policy Violation:\nUser-Agent: null\n{\"big\": \"balloons\"}")
 	}
 	
 	Void testCustomDirectives() {
