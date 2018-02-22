@@ -55,7 +55,7 @@ internal class TestCsrfTokenGuard : SleepSafeTest {
 		res := Element("form").submitForm
 		
 		verifyEq(res.statusCode, 403)
-		verifyEq(res.body.str[0..<-6], "403 - Suspected CSRF attack - Token exceeds 20ms timeout")
+		verifyEq(res.body.str[0..<-8], "403 - Suspected CSRF attack - Token exceeds 20ms timeout")
 	}
 
 	Void testCsrfCustomTokenName() {
