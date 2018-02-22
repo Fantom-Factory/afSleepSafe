@@ -61,7 +61,7 @@ const class SleepSafeModule {
 			duration	:= Duration(DateTime.nowTicks - timestamp)
 			httpRequest.stash["afSleepSafe.csrf.tokenTs"] = DateTime.makeTicks(timestamp)
 			if (duration >= timeout)
-				throw Err("Token exceeds ${timeout} timeout: ${duration}")
+				throw Err("Token exceeds ${timeout} timeout by ${duration.toMin}min")
 		}
 		config["sessionId"] = |Str:Obj? hash| {
 			if (hash.containsKey("sId")) {
