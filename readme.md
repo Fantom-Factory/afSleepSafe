@@ -1,8 +1,8 @@
-#Sleep Safe v1.0.0
+#Sleep Safe v1.0.2
 ---
 
 [![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
-[![pod: v1.0.0](http://img.shields.io/badge/pod-v1.0.0-yellow.svg)](http://www.fantomfactory.org/pods/afSleepSafe)
+[![pod: v1.0.2](http://img.shields.io/badge/pod-v1.0.2-yellow.svg)](http://www.fantomfactory.org/pods/afSleepSafe)
 ![Licence: ISC Licence](http://img.shields.io/badge/licence-ISC Licence-blue.svg)
 
 ## Overview
@@ -49,9 +49,9 @@ Class                   Guards Against                            Notes
 `CsrfTokenGuard`        Cross Site Forgery Requests (CSRF)        Enforces an customisable Encrypted Token Pattern strategy
 `FrameOptionsGuard`     Clickjacking                              Sets an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame
 `ReferrerPolicyGuard`   Private / Internal URL leaking            Sets a 'Referrer-Policy' HTTP response header that tells browsers how and when to transmit the HTTP Referer (sic) header
-`SameOriginGuard`       Cross Site Forgery Requests (CSRF)        Checks the 'Referer' or 'Origin' HTTP header matches the 'Host'
+`SameOriginGuard`       Cross Site Forgery Requests (CSRF)        (Disabled by default) Checks the 'Referer' or 'Origin' HTTP header matches the 'Host'
 `SessionHijackGuard`    Session Hijacking                         Caches browser user-agent parameters and checks them on each request, dropping the session if they change.
-`StrictTransportGuard`  Protocol Downgrades and Cookie Hijacking  Sets a 'Strict-Transport-Security' HTTP header that tells browsers to use HTTPS
+`StrictTransportGuard`  Protocol Downgrades and Cookie Hijacking  (Disabled by default) Sets a 'Strict-Transport-Security' HTTP header that tells browsers to use HTTPS
 `XssProtectionGuard`    Cross Site Scripting (XSS)                Sets an 'X-XSS-Protection' HTTP header that tells browsers enable XSS filtering
 ```
 

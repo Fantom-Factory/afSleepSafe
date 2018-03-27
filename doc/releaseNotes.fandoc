@@ -1,5 +1,6 @@
 v1.0.2
 ======
+ - New: Added override hook to 'SleepSafeMiddleware' to optionally exempt HTTP requests from being guarded.
  - New: CSRF token timestamp is placed in 'HttpRequest.stash["afSleepSafe.csrf.tokenTs"]' upon verification.
  - Chg: 'SameOriginGuard' is disabled by default as the preferred 'Referrer-Policy' header may interfer with it.
  - Chg: CSP report function now also prints out the 'User-Agent' header.

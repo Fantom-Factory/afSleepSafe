@@ -29,7 +29,8 @@ const class SleepSafeMiddleware : Middleware {
 	** The Guards used to protect / reject each HTTP request.
 					const Guard[]				guards
 	
-	private new make(Type:Guard guards, |This| f) {
+	@NoDoc
+	new make(Type:Guard guards, |This| f) {
 		f(this)		
 		// note: we can inject just "Guard[]" when we upgrade to afIoc 3.0.8  
 		this.guards = guards.vals
@@ -37,15 +38,21 @@ const class SleepSafeMiddleware : Middleware {
 	
 	@NoDoc
 	override Void service(MiddlewarePipeline pipeline) {
-		denied := guards.eachWhile { it.guard(req, res) }
-		
-		if (denied != null)
-			rejectSuspectedAttack(denied)
-		else
-			pipeline.service
+		if (shouldGuardRequest(req)) {
+			denied := guards.eachWhile { it.guard(req, res) }		
+			if (denied != null)
+				return rejectSuspectedAttack(denied)
+		}
+		pipeline.service
 	}
 	
-	** Hook to respond to failed Guard checks. 
+	** Override hook to optionally exempt HTTP requests from being guarded by SleepSafe.
+	** Sometimes you want to exclude URLs from being processed, this override hook lets you do that by optionally returning 'false'.
+	** 
+	** This method defaults to returning 'true'.
+	virtual Bool shouldGuardRequest(HttpRequest httpReq) { true }
+	
+	** Override hook to respond to failed Guard checks. 
 	** Defaults to logging the msg (at warn level) and processes a 403 status.
 	virtual Void rejectSuspectedAttack(Str msg) {
 		log.warn(msg)
