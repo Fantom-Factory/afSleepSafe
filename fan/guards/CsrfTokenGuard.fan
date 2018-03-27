@@ -180,6 +180,12 @@ const class CsrfTokenGuard : Guard {
 			}
 		}
 
+		return validateToken(csrfToken)
+	}
+
+	** Manually validates a given CSRF token. 
+	** Returns 'null' if valid, or an error string if invalid.
+	Str? validateToken(Str csrfToken) {
 		hash := null as Str:Obj?
 		try {
 			fanRaw	:= crypto.decode(csrfToken)
@@ -196,7 +202,7 @@ const class CsrfTokenGuard : Guard {
 
 		return null
 	}
-
+	
 	internal static Bool fromVunerableUrl(HttpRequest httpReq) {
 		if (httpReq.httpMethod == "POST") {
 			contentType := httpReq.headers.contentType?.noParams
