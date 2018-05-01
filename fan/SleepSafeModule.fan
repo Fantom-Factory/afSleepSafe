@@ -71,6 +71,7 @@ const class SleepSafeModule {
 					return
 				if (httpSession.id != hash["sId"])
 					throw Err("Session ID mismatch")
+//					throw Err("Session ID mismatch: $httpSession.id != " + hash["sId"].toStr)
 			}
 			// if no sId but HTTP session exists...
 			// that's normal if the session is created *after* the token is generated
