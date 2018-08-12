@@ -159,7 +159,6 @@ const class CsrfTokenGuard : Guard {
 
 		if (httpReq.url.query.containsKey(tokenName)) {
 			csrfToken = httpReq.url.query[tokenName]
-
 		} else {
 			contentType := httpReq.headers.contentType.noParams
 			if (contentType == mimeApplication || contentType == mimePlainText) {
@@ -168,8 +167,6 @@ const class CsrfTokenGuard : Guard {
 					return csrfErr("No form data")
 
 				csrfToken = form[tokenName]
-				if (csrfToken == null)
-					return csrfErr("Form does not contain '${tokenName}' key")
 
 			} else {
 				httpReq.body.buf // cache the InStream so it may be re-read by the app later
@@ -179,6 +176,9 @@ const class CsrfTokenGuard : Guard {
 				}
 			}
 		}
+
+		if (csrfToken == null)
+			return csrfErr("Form does not contain '${tokenName}' key")
 
 		return validateToken(csrfToken)
 	}

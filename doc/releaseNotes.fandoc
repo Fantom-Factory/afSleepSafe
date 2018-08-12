@@ -1,3 +1,7 @@
+v1.0.4
+======
+ - Chg: More explicit err msg (and not an NPE) when 'csrfToken' is not found in a multipart form.
+
 v1.0.2
 ======
  - New: Added override hook to 'SleepSafeMiddleware' to optionally exempt HTTP requests from being guarded.
