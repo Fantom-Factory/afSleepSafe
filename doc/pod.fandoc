@@ -1,6 +1,6 @@
 Overview
 ********
-Guards your BedSheet web app against CSFR, XSS, and other attacks, letting you Sleep Safe at night!
+Guards your BedSheet web app against CSRF, XSS, and other attacks, letting you Sleep Safe at night!
 
 For the most part, Sleep Safe is completely unobtrusive. Simply reference 'afSleepSafe' as a dependecny in your project's 'build.fan' and let the sensible defaults monitor your HTTP requests and set protective HTTP response headers.
 
