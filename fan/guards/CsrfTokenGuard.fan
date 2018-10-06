@@ -139,7 +139,7 @@ const class CsrfTokenGuard : Guard {
 	override const Str protectsAgainst	:= "CSRF"
 
 	@NoDoc
-	override Str? guard(HttpRequest httpReq, HttpResponse httpRes) {
+	override Obj? guard(HttpRequest httpReq, HttpResponse httpRes) {
 		// let's not do crypo stuff on *every* request but rather, only when we need it
 		// most requests will be for images, static pages, etc, and only rarely will we render a form
 		// httpReq.stash["afSleepSafe.csrfToken"]	= generateToken()
@@ -154,7 +154,7 @@ const class CsrfTokenGuard : Guard {
 		return fromVunerableUrl(httpReq) ? doProtection(httpReq, httpRes) : null
 	}
 
-	private Str? doProtection(HttpRequest httpReq, HttpResponse httpRes) {
+	private Obj? doProtection(HttpRequest httpReq, HttpResponse httpRes) {
 		csrfToken := null as Str
 
 		if (httpReq.url.query.containsKey(tokenName)) {
@@ -185,7 +185,7 @@ const class CsrfTokenGuard : Guard {
 
 	** Manually validates a given CSRF token. 
 	** Returns 'null' if valid, or an error string if invalid.
-	Str? validateToken(Str csrfToken) {
+	Obj? validateToken(Str csrfToken) {
 		hash := null as Str:Obj?
 		try {
 			fanRaw	:= crypto.decode(csrfToken)
@@ -195,12 +195,7 @@ const class CsrfTokenGuard : Guard {
 		} catch (Err err)
 			return csrfErr("Invalid '${tokenName}' value")
 
-		try
-			valFuncs.call(hash)
-		catch (Err err)
-			return csrfErr(err.msg)
-
-		return null
+		return valFuncs.call(hash)
 	}
 	
 	internal static Bool fromVunerableUrl(HttpRequest httpReq) {
@@ -252,7 +247,9 @@ const class CsrfTokenValidation {
 		this.funcs = funcs
 	}
 
-	Void call(Str:Obj? hash) {
-		funcs.each { it.call(hash) }
+	Obj? call(Str:Obj? hash) {
+		try	funcs.each { it.call(hash) }
+		catch (Err err)	return err
+		return null
 	}
 }

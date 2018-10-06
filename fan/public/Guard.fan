@@ -18,7 +18,7 @@ const mixin Guard {
 	abstract Str protectsAgainst()
 	//{ "" }
 	
-	** Called at the start of HTTP request. Return an error message to reject the request.  
-	abstract Str? guard(HttpRequest req, HttpResponse res)
+	** Called at the start of HTTP request. Return an error message / object to reject the request.  
+	abstract Obj? guard(HttpRequest req, HttpResponse res)
 	
 }
