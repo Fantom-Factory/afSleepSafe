@@ -3,6 +3,7 @@ using afIocConfig
 using afBedSheet
 using afConcurrent::ActorPools
 using concurrent::ActorPool
+using util::JsonInStream
 
 @NoDoc
 const class SleepSafeModule {
@@ -61,7 +62,7 @@ const class SleepSafeModule {
 			duration	:= Duration(DateTime.nowTicks - timestamp)
 			httpRequest.stash["afSleepSafe.csrf.tokenTs"] = DateTime.makeTicks(timestamp)
 			if (duration >= timeout)
-				throw Err("Token exceeds ${timeout} timeout by ${(duration-timeout).toLocale}")
+				throw Err("Suspected CSRF attack - Token exceeds ${timeout} timeout by ${(duration-timeout).toLocale}")
 		}
 		config["sessionId"] = |Str:Obj? hash| {
 			if (hash.containsKey("sId")) {
@@ -70,7 +71,7 @@ const class SleepSafeModule {
 					// we could throw an CSRF err, but more likely the app will want to redirect to a login page 
 					return
 				if (httpSession.id != hash["sId"])
-					throw Err("Session ID mismatch")
+					throw Err("Suspected CSRF attack - Session ID mismatch")
 //					throw Err("Session ID mismatch: $httpSession.id != " + hash["sId"].toStr)
 			}
 			// if no sId but HTTP session exists...
@@ -85,8 +86,15 @@ const class SleepSafeModule {
 		reportFn  := (|Str:Obj?->Obj?|?) configSrc.get("afSleepSafe.cspReportFn", null, false)
 		if (reportUri != null && reportFn != null) {
 			routeFn	:=  |->Obj?| {
-				json := httpReq.body.jsonMap
-				return reportFn(json) ?: Text.fromPlain("OK")
+				jstr := httpReq.body.str ?: "null"
+				json := null
+				try json = JsonInStream(jstr.in).readJson
+				catch (ParseErr perr)
+					throw HttpStatus.makeErr(400, "CSP Reporter - Invalid JSON Data", Err(jstr))
+				jobj := json as Str:Obj?
+				if (jobj == null)
+					throw HttpStatus.makeErr(400, "CSP Reporter - Invalid JSON Data", Err(jstr))
+				return reportFn(jobj) ?: Text.fromPlain("OK")
 			}.toImmutable
 			
 			config.add(Route(reportUri,	routeFn, "POST"))

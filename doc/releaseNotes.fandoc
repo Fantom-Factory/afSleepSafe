@@ -1,5 +1,6 @@
 v1.0.4
 ======
+ - New: Explicit handling of dodgy JSON data sent to CSP reporter.
  - Chg: Guards may now return an err Obj, not just a Str.
  - Chg: More explicit err msg (and not an NPE) when 'csrfToken' is not found in a multipart form.
  - Chg: CSRF token timeout err msg shows the correct exceed time.
