@@ -55,7 +55,7 @@ internal class TestCsrfTokenGuard : SleepSafeTest {
 		res := Element("form").submitForm
 		
 		verifyEq(res.statusCode, 403)
-		verifyEq(res.body.str[0..<-8], "403 - sys::Err: Token exceeds 20ms timeout")
+		verifyEq(res.body.str[0..<44], "403 - Suspected CSRF attack - Token expired.")
 	}
 
 	Void testCsrfCustomTokenName() {
@@ -89,7 +89,7 @@ internal class TestCsrfTokenGuard : SleepSafeTest {
 		res := Element("form").submitForm
 		
 		verifyEq(res.statusCode, 403)
-		verifyEq(res.body.str, "403 - sys::Err: Custom Boom!")
+		verifyEq(res.body.str, "403 - Custom Boom!")
 	}
 
 	Void testCsrfPlainTextEnc() {
@@ -146,7 +146,7 @@ internal class TestCsrfTokenGuard : SleepSafeTest {
 		client.errOn4xx.enabled = false
 		res = Element("form").submitForm
 		verifyEq(res.statusCode, 403)
-		verifyEq(res.body.str, "403 - sys::Err: Session ID mismatch")
+		verifyEq(res.body.str, "403 - Suspected CSRF attack - Session ID mismatch")
 	}
 }
 

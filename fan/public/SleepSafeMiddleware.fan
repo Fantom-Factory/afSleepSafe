@@ -55,7 +55,7 @@ const class SleepSafeMiddleware : Middleware {
 	** Override hook to respond to failed Guard checks. 
 	** Defaults to logging the msg (at warn level) and processes a 403 status.
 	virtual Void rejectSuspectedAttack(Obj errObj) {
-		msg := errObj.toStr
+		msg := errObj is Err ? ((Err) errObj).msg : errObj.toStr
 		log.warn(msg)
 		resPros.processResponse(HttpStatus(rejectedStatusCode, msg))
 	}

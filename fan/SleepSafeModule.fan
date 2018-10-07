@@ -62,7 +62,7 @@ const class SleepSafeModule {
 			duration	:= Duration(DateTime.nowTicks - timestamp)
 			httpRequest.stash["afSleepSafe.csrf.tokenTs"] = DateTime.makeTicks(timestamp)
 			if (duration >= timeout)
-				throw Err("Suspected CSRF attack - Token exceeds ${timeout} timeout by ${(duration-timeout).toLocale}")
+				throw Err("Suspected CSRF attack - Token expired. Token exceeds ${timeout} timeout by ${(duration-timeout).toLocale}")
 		}
 		config["sessionId"] = |Str:Obj? hash| {
 			if (hash.containsKey("sId")) {
