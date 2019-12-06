@@ -6,7 +6,7 @@ class Build : BuildPod {
 	new make() {
 		podName = "afSleepSafe"
 		summary = "Sleep safe knowing you're guarded against CSRF, XSS, and other web attacks"
-		version = Version("1.0.4")
+		version = Version("1.0.5")
 
 		meta = [
 			"pod.dis"		: "Sleep Safe",
