@@ -1,36 +1,37 @@
-#Sleep Safe v1.0.2
+# Sleep Safe v1.0.4
 ---
 
-[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](http://fantom-lang.org/)
-[![pod: v1.0.2](http://img.shields.io/badge/pod-v1.0.2-yellow.svg)](http://www.fantomfactory.org/pods/afSleepSafe)
-![Licence: ISC Licence](http://img.shields.io/badge/licence-ISC Licence-blue.svg)
+[![Written in: Fantom](http://img.shields.io/badge/written%20in-Fantom-lightgray.svg)](https://fantom-lang.org/)
+[![pod: v1.0.4](http://img.shields.io/badge/pod-v1.0.4-yellow.svg)](http://eggbox.fantomfactory.org/pods/afSleepSafe)
+[![Licence: ISC](http://img.shields.io/badge/licence-ISC-blue.svg)](https://choosealicense.com/licenses/isc/)
 
 ## Overview
 
-Guards your BedSheet web app against CSFR, XSS, and other attacks, letting you Sleep Safe at night!
+Guards your BedSheet web app against CSRF, XSS, and other attacks, letting you Sleep Safe at night!
 
 For the most part, Sleep Safe is completely unobtrusive. Simply reference `afSleepSafe` as a dependecny in your project's `build.fan` and let the sensible defaults monitor your HTTP requests and set protective HTTP response headers.
 
 Note that other Alien-Factory libraries integrate seemlessly with Sleep Safe:
 
-- [Duvet](http://eggbox.fantomfactory.org/pods/afDuvet) - When injecting scripts and stylesheets, Duvet will automatically adjust the Content-Security-Policy to include a hash of the added content.
-- [FormBean](http://eggbox.fantomfactory.org/pods/afFormBean) - When rendering forms, FormBean will automatically render any CSRF token as hidden inputs.
+* [Duvet](http://eggbox.fantomfactory.org/pods/afDuvet) - When injecting scripts and stylesheets, Duvet will automatically adjust the Content-Security-Policy to include a hash of the added content.
+* [FormBean](http://eggbox.fantomfactory.org/pods/afFormBean) - When rendering forms, FormBean will automatically render any CSRF token as hidden inputs.
 
-## Install
+
+## <a name="Install"></a>Install
 
 Install `Sleep Safe` with the Fantom Pod Manager ( [FPM](http://eggbox.fantomfactory.org/pods/afFpm) ):
 
     C:\> fpm install afSleepSafe
 
-Or install `Sleep Safe` with [fanr](http://fantom.org/doc/docFanr/Tool.html#install):
+Or install `Sleep Safe` with [fanr](https://fantom.org/doc/docFanr/Tool.html#install):
 
     C:\> fanr install -r http://eggbox.fantomfactory.org/fanr/ afSleepSafe
 
-To use in a [Fantom](http://fantom-lang.org/) project, add a dependency to `build.fan`:
+To use in a [Fantom](https://fantom-lang.org/) project, add a dependency to `build.fan`:
 
     depends = ["sys 1.0", ..., "afSleepSafe 1.0"]
 
-## Documentation
+## <a name="documentation"></a>Documentation
 
 Full API & fandocs are available on the [Eggbox](http://eggbox.fantomfactory.org/pods/afSleepSafe/) - the Fantom Pod Repository.
 
@@ -40,20 +41,19 @@ Sleep Safe is BedSheet middleware that inspects HTTP requests as they come in an
 
 Request inspection is done by Guard classes, and include:
 
-```
-table:
-Class                   Guards Against                            Notes
-----------------------  ----------------------------------------  ------------
-`CspGuard`              Cross Site Scripting (XSS)                Sets a 'Content-Security-Policy' HTTP response header that tells browsers to restrict where content can be loaded from.
-`ContentTypeGuard`      Content Sniffing                          Sets a 'X-Content-Type-Options' HTTP response header that tells browsers to trust the 'Content-Type' header
-`CsrfTokenGuard`        Cross Site Forgery Requests (CSRF)        Enforces an customisable Encrypted Token Pattern strategy
-`FrameOptionsGuard`     Clickjacking                              Sets an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame
-`ReferrerPolicyGuard`   Private / Internal URL leaking            Sets a 'Referrer-Policy' HTTP response header that tells browsers how and when to transmit the HTTP Referer (sic) header
-`SameOriginGuard`       Cross Site Forgery Requests (CSRF)        (Disabled by default) Checks the 'Referer' or 'Origin' HTTP header matches the 'Host'
-`SessionHijackGuard`    Session Hijacking                         Caches browser user-agent parameters and checks them on each request, dropping the session if they change.
-`StrictTransportGuard`  Protocol Downgrades and Cookie Hijacking  (Disabled by default) Sets a 'Strict-Transport-Security' HTTP header that tells browsers to use HTTPS
-`XssProtectionGuard`    Cross Site Scripting (XSS)                Sets an 'X-XSS-Protection' HTTP header that tells browsers enable XSS filtering
-```
+    table:
+    Class                   Guards Against                            Notes
+    ----------------------  ----------------------------------------  ------------
+    `CspGuard`              Cross Site Scripting (XSS)                Sets a 'Content-Security-Policy' HTTP response header that tells browsers to restrict where content can be loaded from.
+    `ContentTypeGuard`      Content Sniffing                          Sets a 'X-Content-Type-Options' HTTP response header that tells browsers to trust the 'Content-Type' header
+    `CsrfTokenGuard`        Cross Site Forgery Requests (CSRF)        Enforces an customisable Encrypted Token Pattern strategy
+    `FrameOptionsGuard`     Clickjacking                              Sets an 'X-Frame-Options' HTTP header that tells browsers not to embed the page in a frame
+    `ReferrerPolicyGuard`   Private / Internal URL leaking            Sets a 'Referrer-Policy' HTTP response header that tells browsers how and when to transmit the HTTP Referer (sic) header
+    `SameOriginGuard`       Cross Site Forgery Requests (CSRF)        (Disabled by default) Checks the 'Referer' or 'Origin' HTTP header matches the 'Host'
+    `SessionHijackGuard`    Session Hijacking                         Caches browser user-agent parameters and checks them on each request, dropping the session if they change.
+    `StrictTransportGuard`  Protocol Downgrades and Cookie Hijacking  (Disabled by default) Sets a 'Strict-Transport-Security' HTTP header that tells browsers to use HTTPS
+    `XssProtectionGuard`    Cross Site Scripting (XSS)                Sets an 'X-XSS-Protection' HTTP header that tells browsers enable XSS filtering
+    
 
 See the individual class documentation for more details.
 
@@ -65,12 +65,11 @@ When a Guard rejects a HTTP request, it processes a standard BedSheet `HttpStatu
 
 Use IoC Config to change the status code:
 
-```
-@Contribute { serviceType=ApplicationDefaults# }
-Void contributeAppDefaults(Configuration config) {
-    config["afSleepSafe.rejectedStatusCode"] = 400
-}
-```
+    @Contribute { serviceType=ApplicationDefaults# }
+    Void contributeAppDefaults(Configuration config) {
+        config["afSleepSafe.rejectedStatusCode"] = 400
+    }
+    
 
 or as [SleepSafeMiddleware](http://eggbox.fantomfactory.org/pods/afSleepSafe/api/SleepSafeMiddleware) is a service, you can override it and the `rejectSuspectedAttack()` method.
 
