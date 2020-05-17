@@ -6,7 +6,7 @@ class Build : BuildPod {
 	new make() {
 		podName = "afSleepSafe"
 		summary = "Sleep safe knowing you're guarded against CSRF, XSS, and other web attacks"
-		version = Version("1.0.5")
+		version = Version("1.0.6")
 
 		meta = [
 			"pod.dis"		: "Sleep Safe",
@@ -16,9 +16,9 @@ class Build : BuildPod {
 		]
 
 		depends = [
-			"sys          1.0.70 - 1.0",
-			"concurrent   1.0.70 - 1.0",
-			"util         1.0.70 - 1.0",
+			"sys          1.0.74 - 1.0",
+			"concurrent   1.0.74 - 1.0",
+			"util         1.0.74 - 1.0",
 
 			// ---- Core ------------------------
 			"afIoc        3.0.6  - 3.0",
@@ -27,11 +27,11 @@ class Build : BuildPod {
 			"afConcurrent 1.0.20 - 1.1",
 
 			// ---- Web -------------------------
-			"afBedSheet   1.5.10  - 1.5",
+			"afBedSheet   1.5.16  - 1.5",
 
 			// ---- Test ------------------------
-			"afBounce     1.1.8  - 1.1",
-			"afButter     1.2.8  - 1.2",
+			"afBounce     1.1.12 - 1.1",
+			"afButter     1.2.12 - 1.2",
 		]
 
 		srcDirs = [`fan/`, `fan/guards/`, `fan/internal/`, `fan/public/`, `test/`]

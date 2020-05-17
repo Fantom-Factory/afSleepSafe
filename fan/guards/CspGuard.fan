@@ -56,12 +56,12 @@ using afBedSheet::HttpResponse
 **       config["afSleepSafe.csp.font-src"]    = "'self' https://fonts.googleapis.com/"
 **   }
 **
-** To prevent CSP violations from being logged on the server, remove either (or both) of the following ApplicationDefaults:
-** 
+** To prevent CSP violations from being logged on the server, override the FactoryDefaults by setting either (or both) of the following to 'null' in ApplicationDefaults:
+**
 **   syntax: fantom
-**   config.remove("afSleepSafe.csp.report-uri")
-**   config.remove("afSleepSafe.cspReportFn")
-** 
+**   config["afSleepSafe.csp.report-uri"] = null
+**   config["afSleepSafe.cspReportFn"]    = null
+**
 ** To disable CSP, remove this class from the 'SleepSafeMiddleware' configuration:
 **
 **   syntax: fantom

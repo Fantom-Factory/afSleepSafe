@@ -1,3 +1,7 @@
+v1.0.6
+======
+ - Chg: Recompiled to use latest BedSheet 1.5.16.
+
 v1.0.4
 ======
  - New: Explicit handling of dodgy JSON data sent to CSP reporter.
